@@ -12,8 +12,13 @@ export const SERVICE_NAME = 'step-ants';
 /**
  * 배포 도메인. 환경변수로 덮어쓸 수 있게 둔 이유는 Vercel 프리뷰 배포 때문이다.
  * 프리뷰에서 canonical·og:url 이 프로덕션을 가리키면 색인이 꼬인다.
+ *
+ * `??` 가 아니라 `||` 인 이유: Vercel 대시보드에서 키만 만들고 값을 비워두면
+ * 빈 문자열이 들어온다. `??` 는 빈 문자열을 통과시켜 metadataBase 의
+ * `new URL('')` 에서 빌드가 터진다. 값이 비면 기본값으로 떨어지게 둔다.
  */
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://step.ants-up.com';
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://step.ants-up.com';
 
 import type { Metadata } from 'next';
 import { lessonPath, ROOT_LESSON, type Lesson } from '@/domain/jumi/lessons';
