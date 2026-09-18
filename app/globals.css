@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+/*
+ * 디자인 토큰 — cash-bite(antsup 본체)와 통일.
+ *
+ * 값·이름·전환 방식(:root 다크 기본 + [data-theme='light'] 오버라이드)을 본체에서
+ * 그대로 가져왔다. 원본: cash-bite/app/globals.css
+ * 이름을 바꾸지 않은 게 핵심이다 — 나중에 본체와 컴포넌트를 주고받거나 이 앱을
+ * 다시 합칠 때, 토큰 이름이 같으면 색이 어긋나지 않는다.
+ *
+ * 이 앱에는 테마 토글이 없어 본체의 기본값(다크)으로 굳혀 둔다.
+ * 라이트 블록을 같이 들고 있으므로, 토글이 필요해지면 html 에 data-theme='light' 만 붙이면 된다.
+ */
+:root {
+  --cb-bg: #101013;
+  --cb-surface: #1b1b20;
+  --cb-foreground: #ececef;
+  --cb-muted: #8e8e98;
+  --cb-border-subtle: rgba(255, 255, 255, 0.07);
+  --cb-border-strong: rgba(255, 255, 255, 0.13);
+  --cb-icon-tile: rgba(255, 255, 255, 0.08);
+  --cb-hover: rgba(255, 255, 255, 0.06);
+  --cb-point: #5b8def;
+  --cb-point-hover: #7aa4f3;
+  --cb-on-point: #ffffff;
+  --cb-shadow-elevated: 0 2px 12px -4px rgba(0, 0, 0, 0.4);
+
+  /* 성향 트랙 — 본체 온보딩과 같은 색을 쓴다(트레이더=주황, 가치투자=파랑). */
+  --cb-trader: #e0912a;
+  --cb-value: #6f8cf0;
+}
+
+:root[data-theme='light'] {
+  --cb-bg: #ffffff;
+  --cb-surface: #ffffff;
+  --cb-foreground: #202124;
+  --cb-muted: #5f6368;
+  --cb-border-subtle: #dadce0;
+  --cb-border-strong: #c4c7cc;
+  --cb-icon-tile: #f1f3f4;
+  --cb-hover: #f1f3f4;
+  --cb-point: #2563eb;
+  --cb-point-hover: #1d4ed8;
+  --cb-on-point: #ffffff;
+  --cb-shadow-elevated: 0 1px 3px rgba(60, 64, 67, 0.08);
+
+  --cb-trader: #b5720f;
+  --cb-value: #3b5bd0;
+}
+
+@theme {
+  --color-cb-bg: var(--cb-bg);
+  --color-cb-surface: var(--cb-surface);
+  --color-cb-foreground: var(--cb-foreground);
+  --color-cb-muted: var(--cb-muted);
+  --color-cb-border: var(--cb-border-subtle);
+  --color-cb-border-strong: var(--cb-border-strong);
+  --color-cb-tile: var(--cb-icon-tile);
+  --color-cb-hover: var(--cb-hover);
+  --color-cb-point: var(--cb-point);
+  --color-cb-point-hover: var(--cb-point-hover);
+  --color-cb-on-point: var(--cb-on-point);
+  --color-cb-trader: var(--cb-trader);
+  --color-cb-value: var(--cb-value);
+
+  /* 본체와 같은 한글 폰트(Pretendard). layout.tsx 가 CDN 으로 불러온다. */
+  --font-sans: 'Pretendard Variable', Pretendard, 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--cb-bg);
+    color: var(--cb-foreground);
+  }
+}
+
+/*
+ * 말풍선 등장 — 아래에서 살짝 올라오며 뜬다.
+ * fill-mode both 가 핵심이다. 이게 없으면 지연 중에 이미 보여서 순차 등장이 무너진다.
+ */
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 주미 '입력 중' 점 — 세 개가 시간차로 튄다. */
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+@layer components {
+  .bubble-in {
+    animation: bubble-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .typing-dot {
+    animation: typing-dot 1.2s ease-in-out infinite;
+  }
+
+  .typing-dot:nth-child(2) {
+    animation-delay: 160ms;
+  }
+
+  .typing-dot:nth-child(3) {
+    animation-delay: 320ms;
+  }
+}
+
+/*
+ * 모션을 줄이기로 한 사용자에게는 애니메이션을 걷어낸다.
+ * 레이어 밖에 두어 위 @layer components 규칙을 확실히 덮는다.
+ * (대사 순차 등장 자체도 LessonSection 에서 건너뛴다)
+ */
+@media (prefers-reduced-motion: reduce) {
+  .bubble-in,
+  .typing-dot {
+    animation: none;
+  }
+}
