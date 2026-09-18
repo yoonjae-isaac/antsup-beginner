@@ -2,6 +2,7 @@ import CtaSection from '@/components/landing/CtaSection';
 import LessonIntro from '@/components/landing/LessonIntro';
 import LessonSection from '@/components/landing/LessonSection';
 import StepRail from '@/components/landing/StepRail';
+import SiteFooter from '@/components/layout/SiteFooter';
 import { findNextLesson, lessonPath, type Lesson } from '@/domain/jumi/lessons';
 import { LESSON_CHOICES, LESSON_LINES } from '@/domain/jumi/scripts';
 
@@ -17,18 +18,22 @@ export default function LessonPage({ lesson }: LessonPageProps) {
   const next = findNextLesson(lesson.slug);
 
   return (
-    <main className="mx-auto w-full max-w-md md:max-w-2xl">
-      <LessonIntro />
-      <div className="pt-6 md:pt-8">
-        <StepRail currentSlug={lesson.slug} />
-        <LessonSection
-          lesson={lesson}
-          lines={LESSON_LINES[lesson.slug]}
-          choices={LESSON_CHOICES[lesson.slug]}
-          headingLevel={1}
-        />
-      </div>
-      <CtaSection href={next && lessonPath(next.slug)} />
-    </main>
+    <>
+      <main className="mx-auto w-full max-w-md md:max-w-2xl">
+        <LessonIntro />
+        <div className="pt-6 md:pt-8">
+          <StepRail currentSlug={lesson.slug} />
+          <LessonSection
+            lesson={lesson}
+            lines={LESSON_LINES[lesson.slug]}
+            choices={LESSON_CHOICES[lesson.slug]}
+            headingLevel={1}
+          />
+        </div>
+        <CtaSection href={next && lessonPath(next.slug)} />
+      </main>
+
+      <SiteFooter width="reading" />
+    </>
   );
 }

@@ -29,6 +29,20 @@ export const CHOICE_GROUP_LABEL = '주미에게 할 답장 선택';
 export const STEP_RAIL_LABEL = '가이드 단계';
 
 /**
+ * 푸터 — 소개·출처·면책을 담는 자리.
+ * 구분선이나 배경 없이 본문 아래에 조용히 깔린다(디자인을 끊지 않기 위해).
+ */
+export const FOOTER_ABOUT_HEADING = 'step-ants';
+export const FOOTER_ABOUT =
+  '주식이 처음인 사람을 위한 가이드예요. 주식개미 주미가 어려운 말 대신 일상의 비유로 하나씩 풀어드립니다.';
+export const FOOTER_SOURCE_HEADING = '내용 출처';
+export const FOOTER_SOURCE =
+  '투자 관련 설명은 국세청·금융투자협회·각 증권사 공개 자료를 바탕으로 정리했어요. 세율·한도처럼 자주 바뀌는 숫자는 단정하지 않았습니다.';
+export const FOOTER_DISCLAIMER =
+  '이 사이트의 내용은 투자 정보 제공이 목적이며 특정 종목의 매수·매도를 권유하지 않아요. 투자 판단과 그 결과는 투자자 본인에게 있습니다.';
+export const FOOTER_NOTE = 'AntsUp';
+
+/**
  * 세금·한도·증권사 정보를 다루는 레슨 하단 고지.
  * 대사에서 숫자를 뺐다는 사실만으로는 부족하고, 언제 기준인지가 화면에 남아야 한다.
  */

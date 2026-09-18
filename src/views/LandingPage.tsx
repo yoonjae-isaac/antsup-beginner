@@ -2,6 +2,7 @@ import CtaSection from '@/components/landing/CtaSection';
 import HeroSection from '@/components/landing/HeroSection';
 import LessonSection from '@/components/landing/LessonSection';
 import StepRail from '@/components/landing/StepRail';
+import SiteFooter from '@/components/layout/SiteFooter';
 import { findNextLesson, lessonPath, type Lesson } from '@/domain/jumi/lessons';
 import { LESSON_CHOICES, LESSON_LINES } from '@/domain/jumi/scripts';
 
@@ -20,16 +21,20 @@ export default function LandingPage({ lesson }: LandingPageProps) {
   const next = findNextLesson(lesson.slug);
 
   return (
-    <main className="mx-auto w-full max-w-md md:max-w-2xl">
-      <HeroSection />
-      <StepRail currentSlug={lesson.slug} />
-      <LessonSection
-        lesson={lesson}
-        lines={LESSON_LINES[lesson.slug]}
-        choices={LESSON_CHOICES[lesson.slug]}
-        headingLevel={2}
-      />
-      <CtaSection href={next && lessonPath(next.slug)} />
-    </main>
+    <>
+      <main className="mx-auto w-full max-w-md md:max-w-2xl">
+        <HeroSection />
+        <StepRail currentSlug={lesson.slug} />
+        <LessonSection
+          lesson={lesson}
+          lines={LESSON_LINES[lesson.slug]}
+          choices={LESSON_CHOICES[lesson.slug]}
+          headingLevel={2}
+        />
+        <CtaSection href={next && lessonPath(next.slug)} />
+      </main>
+
+      <SiteFooter width="reading" />
+    </>
   );
 }
