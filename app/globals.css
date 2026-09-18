@@ -97,6 +97,21 @@
   }
 }
 
+/*
+ * 홈 오비트 — 주미 주위를 도는 버튼이 '떠 있게' 만든다.
+ * 노드마다 animation-delay 를 어긋나게 주는 게 핵심이다. 같이 움직이면
+ * 판때기 하나가 흔들리는 것처럼 보이고, 시차가 있어야 각자 떠 있는 것처럼 읽힌다.
+ */
+@keyframes orbit-float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-6px);
+  }
+}
+
 /* 주미 '입력 중' 점 — 세 개가 시간차로 튄다. */
 @keyframes typing-dot {
   0%,
@@ -127,6 +142,21 @@
   .typing-dot:nth-child(3) {
     animation-delay: 320ms;
   }
+
+  /*
+   * 링 위의 한 칸. --ox/--oy(단위원 벡터)는 각 노드가 인라인으로 준다.
+   * 반지름을 %로 잡아 무대 크기만 바꾸면 모바일·데스크톱이 같은 배치로 따라온다.
+   */
+  .orbit-slot {
+    position: absolute;
+    left: calc(50% + var(--ox) * var(--orbit-radius));
+    top: calc(50% + var(--oy) * var(--orbit-radius));
+    transform: translate(-50%, -50%);
+  }
+
+  .orbit-node {
+    animation: orbit-float 6.5s ease-in-out infinite;
+  }
 }
 
 /*
@@ -136,7 +166,8 @@
  */
 @media (prefers-reduced-motion: reduce) {
   .bubble-in,
-  .typing-dot {
+  .typing-dot,
+  .orbit-node {
     animation: none;
   }
 }

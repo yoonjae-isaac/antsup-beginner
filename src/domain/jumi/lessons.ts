@@ -6,7 +6,7 @@
  */
 
 interface StepBase {
-  /** 라우트 세그먼트. 빈 문자열이면 루트('/')다. */
+  /** 라우트 세그먼트. 루트('/')는 레슨이 아니라 홈 허브라 여기 없다. */
   slug: string;
   /** 스텝 네비에 뜨는 짧은 이름. 제목을 그대로 쓰면 길어서 안 들어간다. */
   railLabel: string;
@@ -45,7 +45,7 @@ export type Step = Lesson | PlannedStep;
 export const STEPS: readonly Step[] = [
   {
     ready: true,
-    slug: '',
+    slug: 'stock-basics',
     railLabel: '주식이 뭔가요',
     heading: '주식은 도박이 아니에요',
     seoTitle: '주식 처음이세요? 주미와 함께 시작해요',
@@ -151,8 +151,11 @@ export const STEPS: readonly Step[] = [
 /** 실제로 라우트가 되는 레슨만. 순서는 STEPS 를 따른다. */
 export const LESSONS: readonly Lesson[] = STEPS.filter((step): step is Lesson => step.ready);
 
-/** 루트('/')가 보여주는 레슨. 목록의 첫 항목이라는 약속이다. */
-export const ROOT_LESSON = LESSONS[0];
+/**
+ * 커리큘럼의 첫 레슨. 홈에서 '주린이는 여기'가 향하는 곳이고,
+ * 주미의 첫 인사(히어로)가 붙는 유일한 레슨이다.
+ */
+export const FIRST_LESSON = LESSONS[0];
 
 export function findLesson(slug: string): Lesson | undefined {
   return LESSONS.find((lesson) => lesson.slug === slug);
@@ -168,7 +171,7 @@ export function findNextLesson(slug: string): Lesson | undefined {
   return index === -1 ? undefined : LESSONS[index + 1];
 }
 
-/** 레슨 slug 를 실제 경로로. 루트 레슨은 '/' 다. */
+/** 레슨 slug 를 실제 경로로. */
 export function lessonPath(slug: string): string {
-  return slug === '' ? '/' : `/${slug}`;
+  return `/${slug}`;
 }

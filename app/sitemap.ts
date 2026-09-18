@@ -7,10 +7,18 @@ import { LESSONS, lessonPath } from '@/domain/jumi/lessons';
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
-  return LESSONS.map((lesson) => ({
-    url: new URL(lessonPath(lesson.slug), SITE_URL).toString(),
-    lastModified,
-    changeFrequency: 'monthly',
-    priority: lesson.slug === '' ? 1 : 0.8,
-  }));
+  return [
+    {
+      url: new URL('/', SITE_URL).toString(),
+      lastModified,
+      changeFrequency: 'monthly',
+      priority: 1,
+    },
+    ...LESSONS.map((lesson) => ({
+      url: new URL(lessonPath(lesson.slug), SITE_URL).toString(),
+      lastModified,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+  ];
 }

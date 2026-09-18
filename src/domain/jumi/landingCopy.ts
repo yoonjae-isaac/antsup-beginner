@@ -11,7 +11,16 @@ export const MASCOT_ROLE = '주식개미';
 
 export const HERO_HEADING = '주식, 처음이세요?';
 export const CTA_LABEL = '다음 이야기 들으러 가기';
-export const BACK_TO_HOME = '처음으로';
+export const BACK_TO_HOME = '홈으로';
+
+/** 홈 허브 — 주미를 중심에 둔 여덟 방향 입구. */
+export const HOME_EYEBROW = 'step-ants';
+export const HOME_HEADING = '어디부터 가볼까요?';
+export const HOME_LEAD = '주미를 가운데 두고 여덟 방향으로 길을 냈어요. 필요한 곳을 바로 고르면 돼요.';
+export const ORBIT_NAV_LABEL = '서비스 바로가기';
+export const ORBIT_OPEN_COUNT_LABEL = '열린 곳 다섯';
+export const ORBIT_EMPTY_COUNT_LABEL = '준비 중 세 곳';
+export const ORBIT_EMPTY_HINT = '빈 자리 세 곳은 아직 준비 중이에요';
 
 /** 눌러야 대화가 이어진다는 걸 알려주는 안내. 없으면 멈춘 화면으로 오해한다. */
 export const CHOICE_HINT = '답장을 골라 대화를 이어가세요';

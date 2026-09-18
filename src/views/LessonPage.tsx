@@ -25,6 +25,7 @@ export default function LessonPage({ lesson }: LessonPageProps) {
           lesson={lesson}
           lines={LESSON_LINES[lesson.slug]}
           choices={LESSON_CHOICES[lesson.slug]}
+          headingLevel={1}
         />
       </div>
       <CtaSection href={next && lessonPath(next.slug)} />

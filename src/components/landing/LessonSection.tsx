@@ -14,6 +14,8 @@ interface LessonSectionProps {
   lesson: Lesson;
   lines: readonly JumiLine[];
   choices: readonly ChoicePoint[];
+  /** 위에 히어로가 h1 을 갖고 있으면 2, 이 제목이 그 페이지의 h1 이면 1. */
+  headingLevel: 1 | 2;
 }
 
 /** 주미가 다음 말풍선을 올리기까지의 간격. 길면 기다림이 되고 짧으면 대화가 아니다. */
@@ -49,14 +51,15 @@ function linesForTrack(
  * 대신 **모든 대사를 처음부터 DOM 에 두고 CSS 로 가린다** — 아직 열리지 않은 대사도,
  * 고르지 않은 트랙의 대사도 서버 HTML 에 그대로 담기고 검색봇이 읽는다.
  */
-export default function LessonSection({ lesson, lines, choices }: LessonSectionProps) {
+export default function LessonSection({
+  lesson,
+  lines,
+  choices,
+  headingLevel,
+}: LessonSectionProps) {
   const segments = useMemo(() => buildDialogueSegments(lines, choices), [lines, choices]);
 
-  /**
-   * 루트에는 히어로가 h1 을 갖고 있으니 여기는 h2 다.
-   * 나머지 레슨 페이지에는 히어로가 없으므로 이 제목이 그 페이지의 h1 이 된다.
-   */
-  const Heading = lesson.slug === '' ? 'h2' : 'h1';
+  const Heading = headingLevel === 1 ? 'h1' : 'h2';
 
   /** 고른 답장을 순서대로 쌓는다. 길이가 곧 진행 단계다. */
   const [picked, setPicked] = useState<readonly ChoiceOption[]>([]);

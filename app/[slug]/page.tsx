@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { lessonMetadata } from '@/config/site';
-import { findLesson, LESSONS } from '@/domain/jumi/lessons';
+import { findLesson, FIRST_LESSON, LESSONS } from '@/domain/jumi/lessons';
+import LandingPage from '@/views/LandingPage';
 import LessonPage from '@/views/LessonPage';
 
 interface RouteProps {
@@ -12,7 +13,7 @@ interface RouteProps {
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return LESSONS.filter((lesson) => lesson.slug !== '').map((lesson) => ({ slug: lesson.slug }));
+  return LESSONS.map((lesson) => ({ slug: lesson.slug }));
 }
 
 export async function generateMetadata({ params }: RouteProps): Promise<Metadata> {
@@ -27,5 +28,10 @@ export default async function Page({ params }: RouteProps) {
   const lesson = findLesson(slug);
   if (!lesson) notFound();
 
-  return <LessonPage lesson={lesson} />;
+  // 첫 레슨에서만 주미가 인사를 건넨다 — 처음 만나는 자리이기 때문이다.
+  return lesson.slug === FIRST_LESSON.slug ? (
+    <LandingPage lesson={lesson} />
+  ) : (
+    <LessonPage lesson={lesson} />
+  );
 }

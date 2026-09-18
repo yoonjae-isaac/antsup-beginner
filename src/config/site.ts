@@ -21,13 +21,31 @@ export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://step.ants-up.com';
 
 import type { Metadata } from 'next';
-import { lessonPath, ROOT_LESSON, type Lesson } from '@/domain/jumi/lessons';
+import { lessonPath, type Lesson } from '@/domain/jumi/lessons';
 
-/** 사이트 기본 SEO 문구. 레슨별 문구는 lessons.ts 가 소유한다. */
+/** 홈(서비스 허브)의 SEO 문구. 레슨별 문구는 lessons.ts 가 소유한다. */
 export const SEO = {
-  title: ROOT_LESSON.seoTitle,
-  description: ROOT_LESSON.seoDescription,
+  title: 'step-ants · 주미와 함께하는 주식 첫걸음',
+  description:
+    '주식 기초부터 증시 일정, 시장 뉴스, 투자자들 현황, 거시 지표까지. 주식개미 주미가 필요한 곳으로 안내해요.',
 } as const;
+
+/** 홈 페이지 메타데이터. */
+export function homeMetadata(): Metadata {
+  return {
+    title: SEO.title,
+    description: SEO.description,
+    alternates: { canonical: '/' },
+    openGraph: {
+      type: 'website',
+      locale: 'ko_KR',
+      url: '/',
+      siteName: SERVICE_NAME,
+      title: SEO.title,
+      description: SEO.description,
+    },
+  };
+}
 
 /**
  * 레슨 한 건의 페이지 메타데이터.

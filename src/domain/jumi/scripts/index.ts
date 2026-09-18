@@ -34,7 +34,7 @@ import * as terms from './terms';
 
 /** 레슨 slug → 주미 대사. lessons.ts 의 STEPS 와 짝이 맞아야 한다. */
 export const LESSON_LINES: Record<string, readonly JumiLine[]> = {
-  '': stockBasics.LINES,
+  'stock-basics': stockBasics.LINES,
   'buy-sell': buySell.LINES,
   mindset: mindset.LINES,
   broker: broker.LINES,
@@ -49,7 +49,7 @@ export const LESSON_LINES: Record<string, readonly JumiLine[]> = {
 
 /** 레슨 slug → 사용자 선택지. */
 export const LESSON_CHOICES: Record<string, readonly ChoicePoint[]> = {
-  '': stockBasics.CHOICES,
+  'stock-basics': stockBasics.CHOICES,
   'buy-sell': buySell.CHOICES,
   mindset: mindset.CHOICES,
   broker: broker.CHOICES,

@@ -27,6 +27,7 @@ export default function LandingPage({ lesson }: LandingPageProps) {
         lesson={lesson}
         lines={LESSON_LINES[lesson.slug]}
         choices={LESSON_CHOICES[lesson.slug]}
+        headingLevel={2}
       />
       <CtaSection href={next && lessonPath(next.slug)} />
     </main>
