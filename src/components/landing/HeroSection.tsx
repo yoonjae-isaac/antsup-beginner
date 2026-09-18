@@ -7,7 +7,8 @@ import { HERO_HEADING, MASCOT_NAME, MASCOT_ROLE } from '@/domain/jumi/landingCop
 /** 히어로 — 주미가 먼저 말을 거는 장면. */
 export default function HeroSection() {
   return (
-    <section aria-labelledby="hero-heading" className="px-5 pt-12 pb-9 md:px-8 md:pt-20 md:pb-12">
+    // 위에 홈 링크 머리말이 오므로 여기서 상단 여백을 다 먹지 않는다.
+    <section aria-labelledby="hero-heading" className="px-5 pt-6 pb-9 md:px-8 md:pt-10 md:pb-12">
       <h1
         id="hero-heading"
         className="text-center text-[1.75rem] leading-snug font-bold tracking-tight md:text-[2.5rem]"

@@ -2,6 +2,7 @@ import CtaSection from '@/components/landing/CtaSection';
 import HeroSection from '@/components/landing/HeroSection';
 import LessonSection from '@/components/landing/LessonSection';
 import StepRail from '@/components/landing/StepRail';
+import HomeLink from '@/components/layout/HomeLink';
 import SiteFooter from '@/components/layout/SiteFooter';
 import { findNextLesson, lessonPath, type Lesson } from '@/domain/jumi/lessons';
 import { LESSON_CHOICES, LESSON_LINES } from '@/domain/jumi/scripts';
@@ -23,6 +24,11 @@ export default function LandingPage({ lesson }: LandingPageProps) {
   return (
     <>
       <main className="mx-auto w-full max-w-md md:max-w-2xl">
+        {/* 홈에서 들어온 사람이 돌아갈 길. 첫 레슨에도 반드시 있어야 한다. */}
+        <header className="px-5 pt-7 md:px-8 md:pt-11">
+          <HomeLink />
+        </header>
+
         <HeroSection />
         <StepRail currentSlug={lesson.slug} />
         <LessonSection
