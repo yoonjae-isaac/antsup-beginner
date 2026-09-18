@@ -9,6 +9,8 @@
  * 같은 값을 봐야 하기 때문이다. 둘이 어긋나면 선이 버튼을 안 가리킨다.
  */
 
+import { FIRST_LESSON, lessonPath } from './lessons';
+
 export type OrbitDirection = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
 
 export type OrbitIconKey = 'sprout' | 'calendar' | 'news' | 'people' | 'globe';
@@ -20,6 +22,11 @@ export interface OrbitEntry {
   icon: OrbitIconKey;
   /** 링에서 시선이 가장 먼저 닿는 자리(N)에 두는 1순위 입구. 하나만 둔다. */
   primary?: true;
+  /**
+   * 갈 곳. 아직 없는 입구는 비워 두면 눌리지 않는 버튼으로 그려진다 —
+   * 눌러도 아무 일이 없는 버튼을 살아 있는 척 두지 않기 위해서다.
+   */
+  href?: string;
 }
 
 /** 단위원 위의 방향. y 는 화면 좌표라 위쪽이 음수다. */
@@ -41,7 +48,15 @@ export const DIRECTION_VECTOR: Record<OrbitDirection, { x: number; y: number }> 
  * 비는 세 칸(동·남·서)이 고르게 퍼지게 했다.
  */
 export const ORBIT_ENTRIES: readonly OrbitEntry[] = [
-  { id: 'beginner', direction: 'n', label: '주린이는 여기', icon: 'sprout', primary: true },
+  {
+    id: 'beginner',
+    direction: 'n',
+    label: '주린이는 여기',
+    icon: 'sprout',
+    primary: true,
+    // 경로를 적지 않고 레슨 레지스트리에서 끌어온다 — 첫 레슨 슬러그가 바뀌어도 따라온다.
+    href: lessonPath(FIRST_LESSON.slug),
+  },
   { id: 'calendar', direction: 'ne', label: '증시 일정', icon: 'calendar' },
   { id: 'news', direction: 'se', label: '시장 뉴스', icon: 'news' },
   { id: 'investors', direction: 'sw', label: '투자자들 현황', icon: 'people' },

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import type { CSSProperties } from 'react';
 import OrbitIcon from '@/components/home/OrbitIcon';
 import { JUMI_ART } from '@/domain/jumi/artwork';
@@ -107,20 +108,17 @@ export default function OrbitHub() {
 
       <nav aria-label={ORBIT_NAV_LABEL}>
         <ul>
-          {ORBIT_ENTRIES.map((entry, index) => (
-            <li
-              key={entry.id}
-              className="orbit-slot orbit-node"
-              style={slotStyle(entry.direction, index * FLOAT_STAGGER_MS)}
-            >
-              <button
-                type="button"
-                className={`group flex w-[92px] cursor-pointer flex-col items-center gap-2.5 rounded-2xl border-0 bg-transparent p-0 text-cb-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cb-point lg:w-auto lg:flex-row lg:gap-3 lg:rounded-full lg:py-2.5 lg:pr-5 lg:pl-2.5 lg:transition-colors ${
-                  entry.primary
-                    ? 'lg:border lg:border-cb-trader lg:bg-[#241A0B] lg:hover:bg-[#2C2010]'
-                    : 'lg:border lg:border-cb-border lg:bg-cb-surface lg:hover:border-cb-border-strong lg:hover:bg-cb-hover'
-                }`}
-              >
+          {ORBIT_ENTRIES.map((entry, index) => {
+            const shell = `group flex w-[92px] flex-col items-center gap-2.5 rounded-2xl border-0 bg-transparent p-0 text-cb-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cb-point lg:w-auto lg:flex-row lg:gap-3 lg:rounded-full lg:py-2.5 lg:pr-5 lg:pl-2.5 lg:transition-colors ${
+              entry.href ? 'cursor-pointer' : 'cursor-default'
+            } ${
+              entry.primary
+                ? 'lg:border lg:border-cb-trader lg:bg-[#241A0B] lg:hover:bg-[#2C2010]'
+                : 'lg:border lg:border-cb-border lg:bg-cb-surface lg:hover:border-cb-border-strong lg:hover:bg-cb-hover'
+            }`;
+
+            const body = (
+              <>
                 <span
                   className={`flex size-14 shrink-0 items-center justify-center rounded-[18px] transition-transform duration-200 group-hover:-translate-y-0.5 lg:size-[42px] lg:rounded-full lg:transition-none lg:group-hover:translate-y-0 ${
                     entry.primary
@@ -139,9 +137,29 @@ export default function OrbitHub() {
                 >
                   {entry.label}
                 </span>
-              </button>
-            </li>
-          ))}
+              </>
+            );
+
+            return (
+              <li
+                key={entry.id}
+                className="orbit-slot orbit-node"
+                style={slotStyle(entry.direction, index * FLOAT_STAGGER_MS)}
+              >
+                {entry.href ? (
+                  <Link href={entry.href} className={shell}>
+                    {body}
+                  </Link>
+                ) : (
+                  // 아직 갈 곳이 없으면 disabled — 눌러도 아무 일이 없는 버튼을
+                  // 살아 있는 척 두면 초보는 고장난 화면으로 읽는다.
+                  <button type="button" disabled className={shell}>
+                    {body}
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </div>
