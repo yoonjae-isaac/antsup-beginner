@@ -11,7 +11,7 @@ export const metadata: Metadata = homeMetadata();
  *
  * 숫자를 상수로 빼서 import 하면 빌드가 죽는다. Next 는 세그먼트 설정을
  * 정적으로 읽어야 해서 리터럴만 받는다("Invalid segment configuration export").
- * market.ts 의 MARKET_REVALIDATE_SECONDS 와 같은 값을 유지할 것.
+ * config/backendRoutes.ts 의 MARKET_REVALIDATE_SECONDS 와 같은 값을 유지할 것.
  */
 export const revalidate = 60;
 

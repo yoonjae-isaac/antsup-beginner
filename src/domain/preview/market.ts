@@ -1,8 +1,10 @@
 import { backendGet } from '@/config/backend';
+import { BACKEND_ROUTES } from '@/config/backendRoutes';
 
 /**
  * 홈 프리뷰가 쓰는 시장 한 장면.
- * cash-bite-backend 의 `/market/fx` + `/market/indices` 두 호출을 합친 결과다.
+ * cash-bite-backend 의 환율 + 지수 두 호출을 합쳐 화면이 쓸 모양으로 바꾼다.
+ * 백엔드가 주는 생김새(wire)와 엔드포인트 목록은 config/backendRoutes.ts 에 있다.
  */
 export interface MarketIndex {
   /** 주린이가 아는 이름. 백엔드가 주는 name 은 영문이라 여기서 갈아 끼운다. */
@@ -14,13 +16,6 @@ export interface MarketIndex {
 export interface MarketSnapshot {
   usdKrw: number;
   indices: readonly MarketIndex[];
-}
-
-/** 백엔드 `/market/indices` 응답 한 건. */
-interface IndexQuote {
-  symbol: string;
-  price: number;
-  changePercent: number;
 }
 
 /**
@@ -37,13 +32,6 @@ const INDEX_LABELS: readonly { symbol: string; label: string }[] = [
 ];
 
 /**
- * 시세 갱신 주기(초). 지수는 백엔드가 이미 30초 캐시를 두고 있다.
- * app/page.tsx 의 `export const revalidate` 와 같은 값이어야 한다 — 그쪽은
- * Next 제약으로 리터럴만 쓸 수 있어 여기서 import 해 가지 못한다.
- */
-export const MARKET_REVALIDATE_SECONDS = 60;
-
-/**
  * 시장 한 장면을 받아온다. 하나라도 비면 통째로 null 이다.
  *
  * 반쪽짜리를 그리지 않는 이유: 환율만 있고 지수가 없거나 그 반대면 카드가
@@ -52,8 +40,8 @@ export const MARKET_REVALIDATE_SECONDS = 60;
  */
 export async function loadMarketSnapshot(): Promise<MarketSnapshot | null> {
   const [fx, quotes] = await Promise.all([
-    backendGet<{ usdKrw: number | null }>('/market/fx', MARKET_REVALIDATE_SECONDS),
-    backendGet<IndexQuote[]>('/market/indices', MARKET_REVALIDATE_SECONDS),
+    backendGet(BACKEND_ROUTES.marketFx),
+    backendGet(BACKEND_ROUTES.marketIndices),
   ]);
 
   const usdKrw = fx?.usdKrw;
