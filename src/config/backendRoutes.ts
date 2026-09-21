@@ -47,6 +47,44 @@ export interface IndexQuoteResponse {
  */
 export const MARKET_REVALIDATE_SECONDS = 60;
 
+/** 뉴스 시장 구분. 백엔드 쿼리 값 그대로다. */
+export type NewsMarket = 'KR' | 'US';
+
+/**
+ * `/news` 한 건. publisher·summary 는 기사에 따라 빈다.
+ *
+ * 백엔드는 image 도 주지만 화면에서 쓰지 않는다 — 제3자 도메인이라 next/image 로
+ * 최적화할 수 없고, 핫링크를 막는 언론사가 섞여 있어 목록에 깨진 칸이 생긴다.
+ */
+export interface NewsArticleResponse {
+  id: string;
+  title: string;
+  url: string;
+  publishedAt: string;
+  publisher?: string;
+  summary?: string;
+}
+
+/**
+ * `/news/digest` 한 건 — 하루치 요약이 아니라 **매시 회차**다.
+ *
+ * 크론이 한 시간마다 아직 요약에 안 쓰인 기사만 모아 생성하고, 프롬프트가
+ * 같은 날 앞 회차와 겹치는 사건을 빼도록 지시한다. 그래서 회차끼리 내용이
+ * 이어지지 않고, 뒤로 갈수록 가벼워진다 — 최신 한 건만 보여주면 안 되는 이유다.
+ */
+export interface NewsDigestResponse {
+  digestDate: string;
+  summary: string;
+  articleCount: number;
+  generatedAt: string;
+}
+
+/**
+ * 뉴스 갱신 주기(초). 기사 수집 크론이 5분 간격이라 그보다 자주 받아올 이유가 없다.
+ * app/news/page.tsx 의 `export const revalidate` 와 같은 값을 유지할 것.
+ */
+export const NEWS_REVALIDATE_SECONDS = 300;
+
 export const BACKEND_ROUTES = {
   marketFx: defineEndpoint<FxResponse>({
     path: '/market/fx',
@@ -56,5 +94,17 @@ export const BACKEND_ROUTES = {
   marketIndices: defineEndpoint<IndexQuoteResponse[]>({
     path: '/market/indices',
     revalidate: MARKET_REVALIDATE_SECONDS,
+  }),
+
+  newsArticles: defineEndpoint<NewsArticleResponse[], { market: NewsMarket; limit: number }>({
+    path: '/news',
+    revalidate: NEWS_REVALIDATE_SECONDS,
+    query: ({ market, limit }) => ({ market, limit: String(limit) }),
+  }),
+
+  newsDigests: defineEndpoint<NewsDigestResponse[], { market: NewsMarket; limit: number }>({
+    path: '/news/digest',
+    revalidate: NEWS_REVALIDATE_SECONDS,
+    query: ({ market, limit }) => ({ market, limit: String(limit) }),
   }),
 } as const;

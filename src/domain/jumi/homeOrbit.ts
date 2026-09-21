@@ -9,6 +9,7 @@
  * 같은 값을 봐야 하기 때문이다. 둘이 어긋나면 선이 버튼을 안 가리킨다.
  */
 
+import { NEWS_PATH } from '@/domain/news/route';
 import { FIRST_LESSON, lessonPath } from './lessons';
 
 export type OrbitDirection = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
@@ -58,7 +59,7 @@ export const ORBIT_ENTRIES: readonly OrbitEntry[] = [
     href: lessonPath(FIRST_LESSON.slug),
   },
   { id: 'calendar', direction: 'ne', label: '증시 일정', icon: 'calendar' },
-  { id: 'news', direction: 'se', label: '시장 뉴스', icon: 'news' },
+  { id: 'news', direction: 'se', label: '시장 뉴스', icon: 'news', href: NEWS_PATH },
   { id: 'investors', direction: 'sw', label: '투자자들 현황', icon: 'people' },
   { id: 'macro', direction: 'nw', label: '거시 지표', icon: 'globe' },
 ];

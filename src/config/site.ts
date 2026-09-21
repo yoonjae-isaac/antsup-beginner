@@ -22,6 +22,7 @@ export const SITE_URL =
 
 import type { Metadata } from 'next';
 import { lessonPath, type Lesson } from '@/domain/jumi/lessons';
+import { NEWS_PATH } from '@/domain/news/route';
 
 /** 홈(서비스 허브)의 SEO 문구. 레슨별 문구는 lessons.ts 가 소유한다. */
 export const SEO = {
@@ -43,6 +44,27 @@ export function homeMetadata(): Metadata {
       siteName: SERVICE_NAME,
       title: SEO.title,
       description: SEO.description,
+    },
+  };
+}
+
+/** 시장 뉴스 페이지 메타데이터. */
+export function newsMetadata(): Metadata {
+  const title = '시장 뉴스 · step-ants';
+  const description =
+    '오늘 시장에 무슨 일이 있었는지 한 시간마다 정리해 드려요. 국내·미국 뉴스와 요약을 주식이 처음인 사람도 읽을 수 있게 담았습니다.';
+
+  return {
+    title,
+    description,
+    alternates: { canonical: NEWS_PATH },
+    openGraph: {
+      type: 'website',
+      locale: 'ko_KR',
+      url: NEWS_PATH,
+      siteName: SERVICE_NAME,
+      title,
+      description,
     },
   };
 }
