@@ -1,11 +1,24 @@
 import { backendGet } from '@/config/backend';
-import { BACKEND_ROUTES, type GuruStatStockResponse } from '@/config/backendRoutes';
-import { INVESTOR_NAME_KO } from '@/domain/investors/names';
+import {
+  BACKEND_ROUTES,
+  type GuruStatHolderResponse,
+  type GuruStatStockResponse,
+} from '@/config/backendRoutes';
+import { investorNameByCik, investorNameByPerson } from '@/domain/investors/names';
 import { loadLogos } from '@/domain/stocks/logos';
 import { koreanSymbolName } from '@/domain/stocks/symbolNames';
 
 
 export type StockView = 'held' | 'bought' | 'sold';
+
+/** 한 종목을 들고 있는 거장 한 명 — 보유 수 옆 팝업에 뜬다. */
+export interface GuruHolder {
+  name: string;
+  value: string;
+  /** '신규' · '확대' · '축소' · '유지' · '전량매도'. */
+  changeLabel: string;
+  direction: 'buy' | 'sell' | null;
+}
 
 export interface GuruStock {
   id: string;
@@ -15,12 +28,14 @@ export interface GuruStock {
   monoSource: string;
   name: string;
   /** '거장 9명 보유' 처럼 이미 문장이 된 값. */
-  holders: string;
+  holdersLabel: string;
   /** '+1명' / '신규 2명'. 없으면 null. */
   move: string | null;
   moveDirection: 'buy' | 'sell' | null;
   value: string;
   logo: string | null;
+  /** 이 종목을 들고 있는 거장들. 붙어 있는 숫자와 같은 기준으로 걸러 둔다. */
+  holders: readonly GuruHolder[];
 }
 
 export interface GuruInvestor {
@@ -28,13 +43,20 @@ export interface GuruInvestor {
   /** 'Berkshire Hathaway (Warren Buffett)' 에서 갈라낸 사람 이름. */
   person: string;
   firm: string;
+  /**
+   * 이 사람이 신고한 분기('2026년 2분기'). 사람마다 다르다.
+   * 화면 맨 위 기준 분기만 믿으면, 아직 안 낸 사람의 옛 숫자를 이번 분기로 오해한다.
+   */
+  quarter: string;
+  /** 대표 분기보다 뒤처졌을 때만 붙는 꼬리표('한 분기 전'). 최신이면 null. */
+  lagLabel: string | null;
   total: string;
   topLabel: string | null;
   topTicker: string | null;
   topLogo: string | null;
   positions: string;
-  newCount: number;
-  exitCount: number;
+  newLabel: string;
+  exitLabel: string;
 }
 
 export interface InvestorsBoard {
@@ -51,11 +73,36 @@ const STOCK_LIMIT = 6;
 /** 카드로 세울 투자자 수. */
 const INVESTOR_LIMIT = 8;
 
+/**
+ * 백엔드가 전량 매도 종목을 돌려주는 상한(`EXITS_LIMIT`). `exitCount` 가 이 값이면
+ * 딱 15건이 아니라 **15건 이상**이라는 뜻이다. 그대로 '매도 15' 라고 쓰면 거짓이 된다.
+ * 실제로 버핏·사이먼스·달리오가 전부 15로 잘려서 나온다.
+ */
+const EXITS_LIMIT = 15;
+
+/** 상한에 걸린 수는 '15+' 로 쓴다. */
+function countLabel(count: number, limit: number): string {
+  const text = count.toLocaleString('ko-KR');
+  return count >= limit ? `${text}+` : text;
+}
+
 /** '2026-06-30' → '2026년 2분기'. 13F 는 분기 기준일로 온다. */
 function quarterLabel(reportDate: string): string {
   const [year, month] = reportDate.split('-');
   const quarter = Math.floor((Number(month) - 1) / 3) + 1;
   return `${year}년 ${quarter}분기`;
+}
+
+/**
+ * 대표 분기보다 뒤처진 정도.
+ *
+ * 13F 는 사람마다 내는 시점이 달라, 한 화면에 여러 분기가 섞인다. 뒤처진 카드에
+ * 표시를 안 하면 초보는 전부 같은 분기로 읽는다.
+ */
+function lagLabelOf(quartersBehind: number, isStale?: boolean): string | null {
+  if (isStale === true) return '한동안 공시 없음';
+  if (!Number.isFinite(quartersBehind) || quartersBehind <= 0) return null;
+  return `${quartersBehind}분기 전`;
 }
 
 /** USD → '$812억'. 13F 값은 2023년 규칙 개정 이후 달러 단위다(천 단위 아님). */
@@ -74,10 +121,51 @@ function splitInvestorName(name: string): { firm: string; person: string } {
   return { firm: match[1].trim(), person: match[2].trim() };
 }
 
+const CHANGE_LABEL: Record<GuruStatHolderResponse['change'], string> = {
+  new: '신규',
+  increased: '확대',
+  decreased: '축소',
+  unchanged: '유지',
+  exit: '전량매도',
+};
+
+/**
+ * 종목별 보유 거장 목록.
+ *
+ * 붙어 있는 숫자와 같은 기준으로 거른다 — '2명이 늘림' 옆 팝업에 판 사람이 섞이면
+ * 숫자와 목록이 안 맞는다. 정렬(보유액 내림차순)은 백엔드가 보장한다.
+ */
+function toHolders(
+  rows: readonly GuruStatHolderResponse[] | undefined,
+  view: StockView,
+): GuruHolder[] {
+  // Array.isArray 를 쓰면 안 된다 — readonly 배열을 any[] 로 넓혀서 change 가 any 가 된다.
+  if (rows === undefined) return [];
+
+  const keep = (change: GuruStatHolderResponse['change']) => {
+    if (view === 'bought') return change === 'new' || change === 'increased';
+    if (view === 'sold') return change === 'decreased' || change === 'exit';
+    // 보유 목록에서는 이미 판 사람을 뺀다.
+    return change !== 'exit';
+  };
+
+  return rows.filter((row) => keep(row.change)).map((row) => ({
+    name: investorNameByPerson(row.name) ?? row.name,
+    value: usdLabel(row.value),
+    changeLabel: CHANGE_LABEL[row.change],
+    direction:
+      row.change === 'new' || row.change === 'increased'
+        ? ('buy' as const)
+        : row.change === 'decreased' || row.change === 'exit'
+          ? ('sell' as const)
+          : null,
+  }));
+}
+
 function toStock(row: GuruStatStockResponse, view: StockView, logos: Record<string, string>): GuruStock {
   const ticker = row.ticker ?? '';
 
-  const holders =
+  const holdersLabel =
     view === 'held'
       ? `거장 ${row.holderCount}명 보유`
       : view === 'bought'
@@ -100,7 +188,8 @@ function toStock(row: GuruStatStockResponse, view: StockView, logos: Record<stri
     ticker: ticker === '' ? null : ticker,
     monoSource: name,
     name,
-    holders,
+    holdersLabel,
+    holders: toHolders(row.holders, view),
     move,
     moveDirection:
       view === 'bought' ? 'buy' : view === 'sold' ? 'sell' : row.holderDelta == null || row.holderDelta === 0 ? null : row.holderDelta > 0 ? 'buy' : 'sell',
@@ -155,17 +244,19 @@ export async function loadInvestorsBoard(): Promise<InvestorsBoard> {
     return {
       id: row.cik,
       // 한글 표기가 있으면 그걸 쓰고, 없으면 공시에 적힌 영문 이름을 그대로 둔다.
-      person: INVESTOR_NAME_KO[row.cik] ?? person,
+      person: investorNameByCik(row.cik) ?? person,
       firm,
+      quarter: quarterLabel(row.reportDate),
+      lagLabel: lagLabelOf(row.quartersBehind, row.isStale),
       total: usdLabel(row.totalValue),
       topLabel: top
         ? `${(topTicker === null ? null : koreanSymbolName(topTicker)) ?? topTicker ?? top.nameOfIssuer} · ${top.weight.toFixed(1)}%`
         : null,
       topTicker: topTicker ?? top?.nameOfIssuer ?? null,
       topLogo: topTicker === null ? null : (logos[topTicker.toUpperCase()] ?? null),
-      positions: `${row.positionCount}종목`,
-      newCount: row.newCount,
-      exitCount: row.exitCount,
+      positions: `${row.positionCount.toLocaleString('ko-KR')}종목`,
+      newLabel: `신규 ${row.newCount.toLocaleString('ko-KR')}`,
+      exitLabel: `매도 ${countLabel(row.exitCount, EXITS_LIMIT)}`,
     };
   });
 

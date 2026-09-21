@@ -41,7 +41,8 @@ const TAG: Record<CalendarKind, { text: string; className: string; legend: strin
 };
 
 export default function CalendarBoardView({ board }: CalendarBoardViewProps) {
-  const [market, setMarket] = useState<NewsMarket>('KR');
+  // 기본은 미국. 실적·IPO·지표가 국내보다 훨씬 촘촘해서 처음 열었을 때 볼 게 있다.
+  const [market, setMarket] = useState<NewsMarket>('US');
   const [dayIndex, setDayIndex] = useState<number | null>(null);
 
   const week = board[market];

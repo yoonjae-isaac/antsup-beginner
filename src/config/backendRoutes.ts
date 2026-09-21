@@ -135,6 +135,10 @@ export interface GuruOverviewResponse {
   investors: {
     name: string;
     cik: string;
+    /** 이 투자자가 신고한 분기 기준일. 사람마다 다르다 — 늦게 내는 곳이 있다. */
+    reportDate: string;
+    /** 대표 분기 기준 몇 분기 뒤처졌는지. 0 이면 최신. */
+    quartersBehind: number;
     totalValue: number;
     positionCount: number;
     topHolding?: { nameOfIssuer: string; ticker?: string; weight: number };
@@ -143,6 +147,14 @@ export interface GuruOverviewResponse {
     isStale?: boolean;
   }[];
   filing: { asOfCount: number; totalInvestors: number };
+}
+
+/** 한 종목을 들고 있는 거장 한 명. `/13f/stats` 의 holders 항목. */
+export interface GuruStatHolderResponse {
+  /** 인물명만 온다('Warren Buffett'). CIK 는 없다. */
+  name: string;
+  value: number;
+  change: 'new' | 'increased' | 'decreased' | 'unchanged' | 'exit';
 }
 
 /** `/disclosure/13f/stats` 의 종목 한 건. */
@@ -155,6 +167,8 @@ export interface GuruStatStockResponse {
   buyerCount: number;
   sellerCount: number;
   holderDelta?: number;
+  /** 누가 들고 있는지. 오래된 스냅샷에는 없을 수 있다. */
+  holders?: GuruStatHolderResponse[];
 }
 
 export interface GuruStatsResponse {

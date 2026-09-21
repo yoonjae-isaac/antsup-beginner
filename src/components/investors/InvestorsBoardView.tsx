@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import SegmentedControl from '@/components/common/SegmentedControl';
 import TickerLogo from '@/components/common/TickerLogo';
+import HolderPopover from '@/components/investors/HolderPopover';
 import JumiAvatar from '@/components/jumi/JumiAvatar';
 import { JUMI_ART } from '@/domain/jumi/artwork';
 import type { GuruInvestor, GuruStock, InvestorsBoard, StockView } from '@/domain/investors/investors';
@@ -24,6 +25,13 @@ const VIEWS = [
   { value: 'bought' as const, label: '이번에 산' },
   { value: 'sold' as const, label: '이번에 판' },
 ];
+
+/** 팝업 머리말. 붙어 있는 숫자가 무슨 수인지에 따라 달라야 한다. */
+const HOLDER_TITLE: Record<StockView, string> = {
+  held: '이 종목을 들고 있는 거장',
+  bought: '이번 분기에 늘린 거장',
+  sold: '이번 분기에 줄인 거장',
+};
 
 const SECTION: Record<StockView, { title: string; note: string }> = {
   held: {
@@ -116,7 +124,12 @@ export default function InvestorsBoardView({ board }: InvestorsBoardViewProps) {
 
               <ol className="mt-2.5 lg:mt-4">
                 {stocks.map((stock, index) => (
-                  <StockRow key={stock.id} rank={index + 1} stock={stock} />
+                  <StockRow
+                    holderTitle={HOLDER_TITLE[view]}
+                    key={stock.id}
+                    rank={index + 1}
+                    stock={stock}
+                  />
                 ))}
               </ol>
             </>
@@ -156,7 +169,15 @@ function moveColor(direction: GuruStock['moveDirection']): string {
   return 'text-cb-muted';
 }
 
-function StockRow({ stock, rank }: { stock: GuruStock; rank: number }) {
+function StockRow({
+  stock,
+  rank,
+  holderTitle,
+}: {
+  stock: GuruStock;
+  rank: number;
+  holderTitle: string;
+}) {
   return (
     <li className="flex items-center gap-3 border-t border-cb-border py-3 lg:gap-4 lg:py-4">
       <span className="w-4 shrink-0 font-mono text-[12.5px] font-bold tabular-nums text-[#55555f] lg:w-[22px] lg:text-sm">
@@ -175,8 +196,8 @@ function StockRow({ stock, rank }: { stock: GuruStock; rank: number }) {
         <p className="truncate text-[13px] font-bold lg:text-[15px]">{stock.name}</p>
       </div>
 
-      <span className="hidden w-[150px] shrink-0 text-right text-[13px] text-cb-muted lg:inline">
-        {stock.holders}
+      <span className="hidden w-[164px] shrink-0 text-right text-[13px] text-cb-muted lg:inline">
+        <HolderPopover holders={stock.holders} label={stock.holdersLabel} title={holderTitle} />
       </span>
 
       <div className="shrink-0 text-right lg:contents">
@@ -187,7 +208,9 @@ function StockRow({ stock, rank }: { stock: GuruStock; rank: number }) {
           className={`mt-0.5 font-mono text-[11px] tabular-nums lg:mt-0 lg:w-[110px] lg:text-right lg:text-[13px] ${moveColor(stock.moveDirection)}`}
         >
           {/* 좁은 화면에서는 보유 인원이 변동 자리를 대신한다. 둘 다 넣을 폭이 없다. */}
-          <span className="lg:hidden">{stock.holders}</span>
+          <span className="lg:hidden">
+            <HolderPopover holders={stock.holders} label={stock.holdersLabel} title={holderTitle} />
+          </span>
           <span className="hidden lg:inline">{stock.move ?? ''}</span>
         </p>
       </div>
@@ -201,6 +224,21 @@ function InvestorCard({ investor }: { investor: GuruInvestor }) {
       <p className="text-[13.5px] leading-snug font-bold lg:text-[15px]">{investor.person}</p>
       <p className="mt-1 text-[10.5px] leading-snug text-cb-muted lg:text-[11.5px]">
         {investor.firm}
+      </p>
+
+      {/*
+        사람마다 신고한 분기가 다르다. 카드에 안 적으면 맨 위 기준 분기만 보고
+        전부 이번 분기 숫자로 읽는다 — 아직 안 낸 사람의 지난 분기 보유가 섞인다.
+      */}
+      <p className="mt-2.5 flex flex-wrap items-center gap-1.5">
+        <span className="rounded bg-white/6 px-1.5 py-0.5 font-mono text-[10px] tabular-nums text-[#b6b6c0] lg:text-[10.5px]">
+          {investor.quarter}
+        </span>
+        {investor.lagLabel !== null && (
+          <span className="rounded bg-cb-trader/15 px-1.5 py-0.5 text-[10px] font-bold text-cb-trader lg:text-[10.5px]">
+            {investor.lagLabel}
+          </span>
+        )}
       </p>
 
       <p className="mt-3 text-[11px] text-cb-muted lg:mt-4 lg:text-[11.5px]">신고 총액</p>
@@ -224,8 +262,8 @@ function InvestorCard({ investor }: { investor: GuruInvestor }) {
 
       <p className="mt-3.5 flex flex-wrap gap-x-2.5 gap-y-1 font-mono text-[10.5px] tabular-nums lg:mt-4 lg:text-[11.5px]">
         <span className="text-cb-muted">{investor.positions}</span>
-        <span className="font-bold text-cb-negative">신규 {investor.newCount}</span>
-        <span className="font-bold text-cb-positive">매도 {investor.exitCount}</span>
+        <span className="font-bold text-cb-negative">{investor.newLabel}</span>
+        <span className="font-bold text-cb-positive">{investor.exitLabel}</span>
       </p>
     </li>
   );
