@@ -1,47 +1,50 @@
+import ContentPreview from '@/components/home/ContentPreview';
 import OrbitHub from '@/components/home/OrbitHub';
 import SiteFooter from '@/components/layout/SiteFooter';
-import {
-  HOME_EYEBROW,
-  HOME_HEADING,
-  HOME_LEAD,
-  ORBIT_EMPTY_COUNT_LABEL,
-  ORBIT_EMPTY_HINT,
-  ORBIT_OPEN_COUNT_LABEL,
-} from '@/domain/jumi/landingCopy';
+import { HOME_EYEBROW, HOME_HEADING, ORBIT_EMPTY_HINT } from '@/domain/jumi/landingCopy';
+import type { MarketSnapshot } from '@/domain/preview/market';
+import { INVESTOR_QUOTES, pickDailyQuote } from '@/domain/preview/quotes';
+
+interface HomePageProps {
+  market: MarketSnapshot | null;
+}
 
 /**
  * 홈 — 서비스 허브.
  *
  * 레슨 페이지들과 달리 읽는 화면이 아니라 고르는 화면이라, 본문 컬럼(max-w-2xl)을
  * 쓰지 않고 오비트가 화면을 쓰게 둔다.
- * lg 부터는 카피를 왼쪽으로 빼 2단으로 세운다 — 좁은 화면에서 그대로 키우기만 하면
- * 링이 화면을 다 먹고 글이 밀려난다.
+ * lg 부터는 좌측을 컨텐츠 프리뷰로 세워 2단이 된다 — 좁은 화면에서 그대로 키우기만
+ * 하면 링이 화면을 다 먹고 나머지가 밀려난다.
  */
-export default function HomePage() {
+export default function HomePage({ market }: HomePageProps) {
+  const { quote, index } = pickDailyQuote();
+
   return (
     <>
       <main className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col justify-center gap-8 px-6 py-12 lg:flex-row lg:items-center lg:justify-center lg:gap-20 lg:px-12">
-        <section className="flex flex-col gap-3 lg:w-[380px] lg:shrink-0 lg:gap-5">
-          <span className="text-xs font-bold tracking-[0.2em] text-cb-point uppercase lg:text-[13px] lg:tracking-[0.22em]">
-            {HOME_EYEBROW}
-          </span>
-          <h1 className="text-[1.7rem] leading-snug font-bold tracking-tight text-balance lg:text-[2.875rem] lg:leading-[1.24]">
-            {HOME_HEADING}
-          </h1>
-          <p className="max-w-[19rem] text-[13px] leading-relaxed text-cb-muted lg:text-[15px]">
-            {HOME_LEAD}
-          </p>
+        <section className="flex flex-col gap-5 lg:w-[424px] lg:shrink-0">
+          {/*
+            order 로 위아래를 바꾼다. 모바일에서는 카드가 주미 바로 위에 와야 하고,
+            PC 에서는 제목이 카드 위에 와야 한다. DOM 순서는 제목이 먼저인 채로 두어
+            h1 이 문서 앞쪽에 남는다.
+          */}
+          <div className="order-2 flex flex-col gap-2.5 lg:order-1">
+            <span className="text-xs font-bold tracking-[0.2em] text-cb-point uppercase lg:text-[13px] lg:tracking-[0.22em]">
+              {HOME_EYEBROW}
+            </span>
+            <h1 className="text-[1.6rem] leading-snug font-bold tracking-tight text-balance lg:text-[2rem]">
+              {HOME_HEADING}
+            </h1>
+          </div>
 
-          {/* 링의 점선 칸이 무슨 뜻인지 알려주는 범례. 넓은 화면에서만 자리가 난다. */}
-          <div className="mt-3 hidden flex-col gap-2.5 lg:flex">
-            <div className="flex items-center gap-2.5">
-              <span className="size-[11px] shrink-0 rounded-full bg-cb-point" />
-              <span className="text-[13px] text-[#B6B6C0]">{ORBIT_OPEN_COUNT_LABEL}</span>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <span className="size-[11px] shrink-0 rounded-full border border-dashed border-cb-border-strong" />
-              <span className="text-[13px] text-cb-muted">{ORBIT_EMPTY_COUNT_LABEL}</span>
-            </div>
+          <div className="order-1 lg:order-2">
+            <ContentPreview
+              market={market}
+              quote={quote}
+              quoteIndex={index}
+              quoteTotal={INVESTOR_QUOTES.length}
+            />
           </div>
         </section>
 

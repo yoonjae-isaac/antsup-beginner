@@ -18,9 +18,21 @@ export const HOME_EYEBROW = 'step-ants';
 export const HOME_HEADING = '어디부터 가볼까요?';
 export const HOME_LEAD = '주미를 가운데 두고 여덟 방향으로 길을 냈어요. 필요한 곳을 바로 고르면 돼요.';
 export const ORBIT_NAV_LABEL = '서비스 바로가기';
-export const ORBIT_OPEN_COUNT_LABEL = '열린 곳 다섯';
-export const ORBIT_EMPTY_COUNT_LABEL = '준비 중 세 곳';
 export const ORBIT_EMPTY_HINT = '빈 자리 세 곳은 아직 준비 중이에요';
+
+/**
+ * 홈 좌측 컨텐츠 프리뷰 — 환율·시장 카드와 오늘의 명언 카드.
+ * 숫자는 cash-bite-backend 에서 오고, 여기 있는 건 라벨뿐이다.
+ */
+export const PREVIEW_NAV_LABEL = '컨텐츠 미리보기';
+export const PREVIEW_MARKET_TITLE = '환율 · 시장';
+export const PREVIEW_MARKET_FRESHNESS = '1분마다 새로 받아요';
+export const PREVIEW_USD_KRW_LABEL = '원 / 달러';
+export const PREVIEW_INDEX_HEADING = '오늘 지수';
+/** 상승·하락 색이 나라마다 반대라, 이 화면이 어느 쪽인지는 글로도 남긴다. */
+export const PREVIEW_UPDOWN_NOTE = '상승 파랑 · 하락 빨강으로 보고 있어요';
+export const PREVIEW_QUOTE_TITLE = '오늘의 명언';
+export const PREVIEW_AUTO_HINT = '3초마다 다음 카드로';
 
 /** 눌러야 대화가 이어진다는 걸 알려주는 안내. 없으면 멈춘 화면으로 오해한다. */
 export const CHOICE_HINT = '답장을 골라 대화를 이어가세요';

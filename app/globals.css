@@ -25,6 +25,14 @@
   --cb-on-point: #ffffff;
   --cb-shadow-elevated: 0 2px 12px -4px rgba(0, 0, 0, 0.4);
 
+  /*
+   * 상승·하락. 본체 기본값(상승 파랑 / 하락 빨강)을 그대로 쓴다.
+   * 본체에는 이 둘을 뒤집는 토글(data-updown='swap')이 있지만 여기엔 두지 않았다 —
+   * 이 앱에는 설정 화면이 없고, 대신 카드에 어느 쪽인지 글로 적어 둔다.
+   */
+  --cb-positive: #3b82f6;
+  --cb-negative: #f04452;
+
   /* 성향 트랙 — 본체 온보딩과 같은 색을 쓴다(트레이더=주황, 가치투자=파랑). */
   --cb-trader: #e0912a;
   --cb-value: #6f8cf0;
@@ -44,6 +52,9 @@
   --cb-on-point: #ffffff;
   --cb-shadow-elevated: 0 1px 3px rgba(60, 64, 67, 0.08);
 
+  --cb-positive: #2563eb;
+  --cb-negative: #d93025;
+
   --cb-trader: #b5720f;
   --cb-value: #3b5bd0;
 }
@@ -60,6 +71,8 @@
   --color-cb-point: var(--cb-point);
   --color-cb-point-hover: var(--cb-point-hover);
   --color-cb-on-point: var(--cb-on-point);
+  --color-cb-positive: var(--cb-positive);
+  --color-cb-negative: var(--cb-negative);
   --color-cb-trader: var(--cb-trader);
   --color-cb-value: var(--cb-value);
 
@@ -157,6 +170,71 @@
   .orbit-node {
     animation: orbit-float 6.5s ease-in-out infinite;
   }
+
+  /*
+   * 홈 좌측 컨텐츠 프리뷰.
+   *
+   * 카드 마크업은 한 벌이고, 어느 카드가 앞인지는 트랙의 data-front 하나로 정한다.
+   * 모바일은 옆으로 미는 트랙, lg 부터는 카드가 겹쳐 쌓인 덱 — 레이아웃마다 카드를
+   * 따로 두면 같은 시세와 같은 명언이 HTML 에 두 번 실린다.
+   */
+  /*
+   * 두 레이아웃을 겹치지 않는 미디어쿼리로 완전히 갈라 둔다.
+   * 공통 규칙을 두고 lg 에서 되돌리는 방식은 쓰지 않는다 — 미디어쿼리는 특정도를
+   * 올려주지 않아서, .preview-track[data-front='1'](0,2,0) 의 translateX 를
+   * .preview-track(0,1,0) 의 transform:none 으로 못 덮는다.
+   * 실제로 그렇게 짰다가 PC 에서 덱이 통째로 화면 밖으로 밀려났다.
+   */
+  @media (width < 64rem) {
+    .preview-track {
+      display: flex;
+      transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .preview-track[data-front='1'] {
+      transform: translateX(-100%);
+    }
+
+    .preview-card {
+      width: 100%;
+      height: 100%;
+      flex-shrink: 0;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .preview-track {
+      display: block;
+      position: relative;
+      perspective: 1500px;
+    }
+
+    .preview-card {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      transform-origin: 50% 100%;
+      transition:
+        transform 800ms cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 800ms ease;
+    }
+
+    /* 앞장 */
+    .preview-track[data-front='0'] > .preview-card:nth-child(1),
+    .preview-track[data-front='1'] > .preview-card:nth-child(2) {
+      transform: translate3d(0, 0, 0) rotateX(0deg);
+      opacity: 1;
+      z-index: 20;
+    }
+
+    /* 뒷장 — 아래를 축으로 젖혀지며 물러난다. */
+    .preview-track[data-front='0'] > .preview-card:nth-child(2),
+    .preview-track[data-front='1'] > .preview-card:nth-child(1) {
+      transform: translate3d(0, -26px, -110px) rotateX(7deg);
+      opacity: 0.42;
+      z-index: 10;
+    }
+  }
 }
 
 /*
@@ -169,5 +247,11 @@
   .typing-dot,
   .orbit-node {
     animation: none;
+  }
+
+  /* 카드는 계속 바뀌되 움직이지 않고 바로 자리를 바꾼다. */
+  .preview-track,
+  .preview-card {
+    transition: none;
   }
 }
