@@ -85,6 +85,91 @@ export interface NewsDigestResponse {
  */
 export const NEWS_REVALIDATE_SECONDS = 300;
 
+/** `/macro/overview` 한 건. entry 는 카탈로그 정의, latest 는 최신 관측이다. */
+export interface MacroOverviewResponse {
+  entry: {
+    id: string;
+    label: string;
+    unit: string;
+    category: string;
+    importance: string;
+    /** daily | weekly | monthly | quarterly | annual. 기준일을 어디까지 쓸지 정한다. */
+    frequency: string;
+    description?: string;
+  };
+  latest: {
+    date: string | null;
+    value: number | null;
+    /** 전년 동기 대비 %. 지수형 지표는 이 값이 본체다. */
+    yoyChange: number | null;
+    momChange: number | null;
+  };
+}
+
+/** FRED 는 하루에 한 번꼴로 갱신된다. 그보다 자주 받아올 이유가 없다. */
+export const MACRO_REVALIDATE_SECONDS = 3600;
+
+/** `/calendar` — 실적·IPO·경제지표가 한 응답에 같이 온다. */
+export interface CalendarWeekResponse {
+  from: string;
+  to: string;
+  earnings: {
+    date: string;
+    symbol: string;
+    /** bmo(장전) | amc(장후) | dmh(장중) | '' */
+    hour: string;
+    epsEstimate: number | null;
+    /** KR 은 기업명, US 는 비어 있어 심볼로 읽는다. */
+    name?: string;
+  }[];
+  ipos: { date: string; symbol: string; name: string; price: string | null }[];
+  economic: { date: string; key: string; event: string; impact: string }[];
+}
+
+/** 백엔드가 하루 한 번 주간 일정을 미리 데워 둔다. */
+export const CALENDAR_REVALIDATE_SECONDS = 3600;
+
+/** `/disclosure/13f/overview` — 투자자 카드용. */
+export interface GuruOverviewResponse {
+  asOf: string;
+  investors: {
+    name: string;
+    cik: string;
+    totalValue: number;
+    positionCount: number;
+    topHolding?: { nameOfIssuer: string; ticker?: string; weight: number };
+    newCount: number;
+    exitCount: number;
+    isStale?: boolean;
+  }[];
+  filing: { asOfCount: number; totalInvestors: number };
+}
+
+/** `/disclosure/13f/stats` 의 종목 한 건. */
+export interface GuruStatStockResponse {
+  cusip: string;
+  ticker?: string;
+  nameOfIssuer: string;
+  holderCount: number;
+  totalValue: number;
+  buyerCount: number;
+  sellerCount: number;
+  holderDelta?: number;
+}
+
+export interface GuruStatsResponse {
+  asOf: string;
+  mostHeld: GuruStatStockResponse[];
+  mostBought: GuruStatStockResponse[];
+  mostSold: GuruStatStockResponse[];
+}
+
+/** 13F 는 분기에 한 번 바뀐다. 여섯 시간도 과하게 촘촘한 편이다. */
+export const GURU_REVALIDATE_SECONDS = 21600;
+
+/** 로고는 거의 안 바뀐다. 백엔드도 Redis 에 30일 들고 있다. */
+export const LOGO_REVALIDATE_SECONDS = 86400;
+
 export const BACKEND_ROUTES = {
   marketFx: defineEndpoint<FxResponse>({
     path: '/market/fx',
@@ -106,5 +191,36 @@ export const BACKEND_ROUTES = {
     path: '/news/digest',
     revalidate: NEWS_REVALIDATE_SECONDS,
     query: ({ market, limit }) => ({ market, limit: String(limit) }),
+  }),
+
+  macroOverview: defineEndpoint<MacroOverviewResponse[]>({
+    path: '/macro/overview',
+    revalidate: MACRO_REVALIDATE_SECONDS,
+  }),
+
+  calendarWeek: defineEndpoint<CalendarWeekResponse, { market: NewsMarket }>({
+    path: '/calendar',
+    revalidate: CALENDAR_REVALIDATE_SECONDS,
+    query: ({ market }) => ({ market }),
+  }),
+
+  guruOverview: defineEndpoint<GuruOverviewResponse>({
+    path: '/disclosure/13f/overview',
+    revalidate: GURU_REVALIDATE_SECONDS,
+  }),
+
+  guruStats: defineEndpoint<GuruStatsResponse>({
+    path: '/disclosure/13f/stats',
+    revalidate: GURU_REVALIDATE_SECONDS,
+  }),
+
+  /**
+   * 티커 → 로고 URL. 없는 종목은 키 자체가 없다.
+   * 한 번에 40개까지만 받으므로(백엔드 LOGO_BATCH_LIMIT) 호출부가 잘라서 보내야 한다.
+   */
+  stockLogos: defineEndpoint<Record<string, string>, { symbols: readonly string[] }>({
+    path: '/stocks/logos',
+    revalidate: LOGO_REVALIDATE_SECONDS,
+    query: ({ symbols }) => ({ symbols: symbols.join(',') }),
   }),
 } as const;

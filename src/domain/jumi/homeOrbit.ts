@@ -9,6 +9,9 @@
  * 같은 값을 봐야 하기 때문이다. 둘이 어긋나면 선이 버튼을 안 가리킨다.
  */
 
+import { CALENDAR_PATH } from '@/domain/calendar/route';
+import { INVESTORS_PATH } from '@/domain/investors/route';
+import { MACRO_PATH } from '@/domain/macro/route';
 import { NEWS_PATH } from '@/domain/news/route';
 import { FIRST_LESSON, lessonPath } from './lessons';
 
@@ -58,10 +61,10 @@ export const ORBIT_ENTRIES: readonly OrbitEntry[] = [
     // 경로를 적지 않고 레슨 레지스트리에서 끌어온다 — 첫 레슨 슬러그가 바뀌어도 따라온다.
     href: lessonPath(FIRST_LESSON.slug),
   },
-  { id: 'calendar', direction: 'ne', label: '증시 일정', icon: 'calendar' },
+  { id: 'calendar', direction: 'ne', label: '증시 일정', icon: 'calendar', href: CALENDAR_PATH },
   { id: 'news', direction: 'se', label: '시장 뉴스', icon: 'news', href: NEWS_PATH },
-  { id: 'investors', direction: 'sw', label: '투자자들 현황', icon: 'people' },
-  { id: 'macro', direction: 'nw', label: '거시 지표', icon: 'globe' },
+  { id: 'investors', direction: 'sw', label: '투자자들 현황', icon: 'people', href: INVESTORS_PATH },
+  { id: 'macro', direction: 'nw', label: '거시 지표', icon: 'globe', href: MACRO_PATH },
 ];
 
 export const ORBIT_EMPTY_DIRECTIONS: readonly OrbitDirection[] = ['e', 's', 'w'];

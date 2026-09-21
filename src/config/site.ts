@@ -22,6 +22,9 @@ export const SITE_URL =
 
 import type { Metadata } from 'next';
 import { lessonPath, type Lesson } from '@/domain/jumi/lessons';
+import { CALENDAR_PATH } from '@/domain/calendar/route';
+import { INVESTORS_PATH } from '@/domain/investors/route';
+import { MACRO_PATH } from '@/domain/macro/route';
 import { NEWS_PATH } from '@/domain/news/route';
 
 /** 홈(서비스 허브)의 SEO 문구. 레슨별 문구는 lessons.ts 가 소유한다. */
@@ -48,25 +51,53 @@ export function homeMetadata(): Metadata {
   };
 }
 
-/** 시장 뉴스 페이지 메타데이터. */
-export function newsMetadata(): Metadata {
-  const title = '시장 뉴스 · step-ants';
-  const description =
-    '오늘 시장에 무슨 일이 있었는지 한 시간마다 정리해 드려요. 국내·미국 뉴스와 요약을 주식이 처음인 사람도 읽을 수 있게 담았습니다.';
-
+/** 허브에서 갈라져 나온 화면들의 메타데이터. 형태가 같아 한 곳에서 찍어 낸다. */
+function hubPageMetadata(path: string, title: string, description: string): Metadata {
   return {
     title,
     description,
-    alternates: { canonical: NEWS_PATH },
+    alternates: { canonical: path },
     openGraph: {
       type: 'website',
       locale: 'ko_KR',
-      url: NEWS_PATH,
+      url: path,
       siteName: SERVICE_NAME,
       title,
       description,
     },
   };
+}
+
+export function newsMetadata(): Metadata {
+  return hubPageMetadata(
+    NEWS_PATH,
+    '시장 뉴스 · step-ants',
+    '오늘 시장에 무슨 일이 있었는지 한 시간마다 정리해 드려요. 국내·미국 뉴스와 요약을 주식이 처음인 사람도 읽을 수 있게 담았습니다.',
+  );
+}
+
+export function macroMetadata(): Metadata {
+  return hubPageMetadata(
+    MACRO_PATH,
+    '거시 지표 · step-ants',
+    '물가, 고용, 금리. 개별 종목보다 먼저 시장 전체를 움직이는 숫자들을 주식이 처음인 사람도 읽을 수 있게 정리했어요.',
+  );
+}
+
+export function calendarMetadata(): Metadata {
+  return hubPageMetadata(
+    CALENDAR_PATH,
+    '증시 일정 · step-ants',
+    '이번 주 실적 발표와 경제 지표, 신규 상장 일정을 한눈에. 무슨 날인지까지 풀어서 알려드려요.',
+  );
+}
+
+export function investorsMetadata(): Metadata {
+  return hubPageMetadata(
+    INVESTORS_PATH,
+    '투자자들 현황 · step-ants',
+    '버핏을 비롯한 거장들이 분기마다 공개하는 보유 종목(13F)을 정리했어요. 지금 들고 있다는 뜻은 아니라는 점까지 같이 알려드립니다.',
+  );
 }
 
 /**
