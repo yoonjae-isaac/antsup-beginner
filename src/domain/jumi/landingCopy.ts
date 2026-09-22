@@ -11,6 +11,12 @@ export const MASCOT_ROLE = '주식개미';
 
 export const HERO_HEADING = '주식, 처음이세요?';
 export const CTA_LABEL = '다음 이야기 들으러 가기';
+
+/**
+ * 커리큘럼 마지막 레슨의 CTA. 홈 허브로 보낸다.
+ * 여기까지 온 사람에게 남은 건 레슨이 아니라 실제 시장 화면(뉴스·지표·일정·투자자)이다.
+ */
+export const CTA_FINISH_LABEL = '이제 시장 보러 가기';
 export const BACK_TO_HOME = '홈으로';
 
 /** 홈 허브 — 주미를 중심에 둔 여덟 방향 입구. */
@@ -30,7 +36,8 @@ export const PREVIEW_MARKET_FRESHNESS = '1분마다 새로 받아요';
 export const PREVIEW_USD_KRW_LABEL = '원 / 달러';
 export const PREVIEW_INDEX_HEADING = '오늘 지수';
 /** 상승·하락 색이 나라마다 반대라, 이 화면이 어느 쪽인지는 글로도 남긴다. */
-export const PREVIEW_UPDOWN_NOTE = '상승 파랑 · 하락 빨강으로 보고 있어요';
+// 색 규칙은 globals.css 한 곳에서 정한다(오른 쪽이 빨강). 이 문구가 그걸 따라가야 한다.
+export const PREVIEW_UPDOWN_NOTE = '상승 빨강 · 하락 파랑으로 보고 있어요';
 export const PREVIEW_QUOTE_TITLE = '오늘의 명언';
 export const PREVIEW_AUTO_HINT = '3초마다 다음 카드로';
 
@@ -60,6 +67,16 @@ export const FOOTER_NOTE = 'AntsUp';
  */
 export const FIGURES_NOTICE =
   '세율·한도·증권사 서비스는 자주 바뀌어서, 여기서는 구조만 설명하고 정확한 숫자는 일부러 적지 않았어요. 실제로 하실 땐 증권사 안내나 국세청에서 최신 기준을 확인해 주세요.';
+
+/**
+ * 계산기가 붙는 레슨의 하단 고지.
+ *
+ * FIGURES_NOTICE 를 그대로 쓰면 안 된다 — 그 문구는 '숫자를 일부러 안 적었다'고
+ * 말하는데 계산기는 숫자를 보여 준다. 화면이 자기 말을 뒤집는 셈이다.
+ * 여기서는 '보이는 숫자는 가정이고 바꿀 수 있다'를 대신 말한다.
+ */
+export const CALC_NOTICE =
+  '계산기에 미리 채워둔 값은 계산을 시작하려고 넣어둔 가정이에요. 약속된 숫자가 아니니 직접 바꿔 넣어 보세요. 특히 세율은 바뀌므로 실제로 하실 땐 증권사 안내나 국세청에서 최신 기준을 확인해 주세요. 결과는 참고용이라 실제 금액은 증권사·상품·상황에 따라 달라요.';
 
 /**
  * 스크린리더·검색봇에게 화자를 알려주는 라벨.

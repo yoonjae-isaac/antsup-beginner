@@ -3,7 +3,7 @@ import LessonIntro from '@/components/landing/LessonIntro';
 import LessonSection from '@/components/landing/LessonSection';
 import StepRail from '@/components/landing/StepRail';
 import SiteFooter from '@/components/layout/SiteFooter';
-import { findNextLesson, lessonPath, type Lesson } from '@/domain/jumi/lessons';
+import type { Lesson } from '@/domain/jumi/lessons';
 import { LESSON_CHOICES, LESSON_LINES } from '@/domain/jumi/scripts';
 
 interface LessonPageProps {
@@ -15,8 +15,6 @@ interface LessonPageProps {
  * 이미 주미를 만난 사람이 오는 자리라 인사를 반복하지 않고, 돌아갈 길만 남긴다.
  */
 export default function LessonPage({ lesson }: LessonPageProps) {
-  const next = findNextLesson(lesson.slug);
-
   return (
     <>
       <main className="mx-auto w-full max-w-md md:max-w-2xl">
@@ -30,7 +28,7 @@ export default function LessonPage({ lesson }: LessonPageProps) {
             headingLevel={1}
           />
         </div>
-        <CtaSection href={next && lessonPath(next.slug)} />
+        <CtaSection slug={lesson.slug} />
       </main>
 
       <SiteFooter width="reading" />

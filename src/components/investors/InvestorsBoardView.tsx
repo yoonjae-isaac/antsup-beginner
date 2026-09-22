@@ -4,8 +4,7 @@ import { useState } from 'react';
 import SegmentedControl from '@/components/common/SegmentedControl';
 import TickerLogo from '@/components/common/TickerLogo';
 import HolderPopover from '@/components/investors/HolderPopover';
-import JumiAvatar from '@/components/jumi/JumiAvatar';
-import { JUMI_ART } from '@/domain/jumi/artwork';
+import ThirteenFGuide from '@/components/investors/ThirteenFGuide';
 import type { GuruInvestor, GuruStock, InvestorsBoard, StockView } from '@/domain/investors/investors';
 
 interface InvestorsBoardViewProps {
@@ -15,10 +14,9 @@ interface InvestorsBoardViewProps {
 const HEADING = '투자자들 현황';
 const LEAD =
   '버핏, 아이칸, 애크먼. 미국에서 큰돈을 굴리는 사람들이 분기마다 의무로 공개하는 보유 종목이에요.';
-const JUMI_LEAD = '따라 사는 것보다, 이 사람들이 왜 그 회사를 오래 들고 있는지를 보는 게 남아요.';
 const EMPTY = '아직 가져온 공시가 없어요. 잠시 뒤에 다시 들러 주세요.';
-const NOTE =
-  '미국 SEC 에 제출된 13F 공시를 정리한 값이에요. 1억 달러 넘게 굴리는 기관은 분기마다 보유 주식을 신고해야 해요. 공매도·채권·해외 주식은 신고 대상이 아니라서, 여기 보이는 게 그 사람 자산의 전부는 아니에요.';
+// 13F 가 무엇이고 무엇을 안 담는지는 아래 ThirteenFGuide 가 다 말한다. 여기는 출처만 남긴다.
+const NOTE = '미국 SEC 에 제출된 13F 공시를 정리한 값이에요.';
 
 const VIEWS = [
   { value: 'held' as const, label: '많이 보유' },
@@ -94,10 +92,11 @@ export default function InvestorsBoardView({ board }: InvestorsBoardViewProps) {
         </p>
       </div>
 
-      <div className="mt-[18px] flex items-center gap-2.5 lg:mt-6 lg:gap-3">
-        <JumiAvatar art={JUMI_ART.greeting} size="sm" />
-        <p className="text-[13px] leading-snug text-cb-foreground lg:text-sm">{JUMI_LEAD}</p>
-      </div>
+      {/*
+        주미가 건네는 한 줄이자 13F 사용설명서의 뚜껑이다. 경고 바로 밑, 목록보다 위에
+        둔다 — 아래에 두면 '이렇게 읽으세요'를 다 읽고 내려온 뒤에나 만나게 된다.
+      */}
+      <ThirteenFGuide />
 
       {stocks.length === 0 && board.investors.length === 0 ? (
         <p className="mt-8 text-sm leading-relaxed text-cb-muted">{EMPTY}</p>

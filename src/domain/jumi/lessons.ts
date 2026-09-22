@@ -5,9 +5,26 @@
  * 각각 독립된 검색어라, 한 페이지에 몰아넣으면 어느 쪽으로도 잡히지 않는다.
  */
 
+import type { CalcKey } from '@/domain/calc/keys';
+
+/**
+ * 커리큘럼의 부(部).
+ *
+ * 1부는 계좌를 만들어 첫 매수를 누르기까지, 2부는 그 뒤에 바로 부딪히는 질문들이다.
+ * 나눈 이유는 스텝 네비다 — 열여섯 개를 한 줄로 늘어놓으면 어디까지가 '시작하는 데
+ * 필요한 것'인지 보이지 않는다.
+ */
+export type PartId = 'start' | 'after';
+
+export const PARTS: readonly { id: PartId; label: string }[] = [
+  { id: 'start', label: '1부 · 시작하기' },
+  { id: 'after', label: '2부 · 사고 난 뒤' },
+];
+
 interface StepBase {
   /** 라우트 세그먼트. 루트('/')는 레슨이 아니라 홈 허브라 여기 없다. */
   slug: string;
+  part: PartId;
   /** 스텝 네비에 뜨는 짧은 이름. 제목을 그대로 쓰면 길어서 안 들어간다. */
   railLabel: string;
   /** 화면에 뜨는 카드 제목. */
@@ -25,6 +42,13 @@ export interface Lesson extends StepBase {
    * 대사에서 숫자를 뺐다는 사실만으로는 부족하다 — 언제 기준인지 화면에 남아야 한다.
    */
   figuresNotice?: true;
+  /**
+   * 대화 끝에 붙는 계산기. 읽은 내용을 그 자리에서 숫자로 확인시키는 자리다.
+   *
+   * 고지 문구가 `figuresNotice` 와 다르다 — 그쪽은 '숫자를 일부러 안 적었다'고
+   * 말하는데 계산기는 숫자를 보여 주므로, 계산기가 있으면 CALC_NOTICE 를 쓴다.
+   */
+  calc?: CalcKey;
 }
 
 /** 아직 대사가 없는 주제. 스텝 네비에 자리만 보여주고 링크는 걸지 않는다. */
@@ -45,6 +69,7 @@ export type Step = Lesson | PlannedStep;
 export const STEPS: readonly Step[] = [
   {
     ready: true,
+    part: 'start',
     slug: 'stock-basics',
     railLabel: '주식이 뭔가요',
     heading: '주식은 도박이 아니에요',
@@ -54,6 +79,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'buy-sell',
     railLabel: '사고팔기',
     heading: '사고판다는 게 무슨 말이에요?',
@@ -63,6 +89,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'mindset',
     railLabel: '나는 어떤 투자자',
     heading: '나는 어떤 투자자일까요?',
@@ -72,6 +99,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'broker',
     railLabel: '증권사 고르기',
     heading: '증권계좌, 어디서 만들까요?',
@@ -82,6 +110,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'account-types',
     railLabel: '계좌 종류',
     heading: 'CMA·ISA·IRP가 뭐가 달라요?',
@@ -92,6 +121,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'before-buying',
     railLabel: '사기 전 확인',
     heading: '사기 전에 뭘 봐야 해요?',
@@ -101,6 +131,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'etf',
     railLabel: 'ETF',
     heading: 'ETF가 뭔가요?',
@@ -110,6 +141,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'tax-fee',
     railLabel: '세금·수수료',
     heading: '세금이랑 수수료는요?',
@@ -120,6 +152,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'kr-vs-us',
     railLabel: '국장·미장',
     heading: '국장이랑 미장, 뭐가 달라요?',
@@ -130,6 +163,7 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'terms',
     railLabel: '용어 10개',
     heading: '뉴스가 읽히는 용어 10개',
@@ -139,12 +173,84 @@ export const STEPS: readonly Step[] = [
   },
   {
     ready: true,
+    part: 'start',
     slug: 'after-buy',
     railLabel: '사고 난 뒤',
     heading: '사고 나서는 뭘 해요?',
     seoTitle: '주식 산 뒤에 뭘 해야 하나요?',
     seoDescription:
       '매일 안 봐도 되고, 팔 기준은 미리 정하고, 하락은 정상이에요. 사고 난 뒤가 진짜라는 걸 주식개미 주미가 알려드려요.',
+  },
+
+  // ── 2부 ─ 사고 난 뒤 ────────────────────────────────────────────────
+  // 1부가 첫 매수까지라면, 여기는 계좌에 종목이 담긴 다음 순서대로 부딪히는 질문들이다.
+  // 떨어졌다(물타기) → 언제 파나(손절) → 돈이 들어왔다(배당) → 오래 하면(복리) →
+  // 그럼 얼마씩(목표). 다섯 편 모두 끝에 계산기가 붙는다.
+  {
+    ready: true,
+    part: 'after',
+    slug: 'averaging',
+    railLabel: '물타기·불타기',
+    heading: '내렸을 때 더 사도 될까요?',
+    calc: 'averaging',
+    seoTitle: '물타기 뜻과 평단 계산, 해도 될 때와 안 될 때',
+    seoDescription:
+      '내려서 더 사면 평단은 내려가지만 그 종목에 실린 돈은 늘어나요. 물타기와 불타기의 차이를 주식개미 주미가 평단 계산기로 같이 보여드려요.',
+  },
+  {
+    ready: true,
+    part: 'after',
+    slug: 'stop-loss',
+    railLabel: '손절·손익비',
+    heading: '언제 팔아야 해요?',
+    calc: 'stop-target',
+    seoTitle: '손절가는 사기 전에 정하는 거예요 — 손익비까지',
+    seoDescription:
+      '얼마에 자르고 얼마에 챙길지 미리 정하는 법. 승률보다 손익비를 먼저 보는 이유를 주식개미 주미가 계산기로 알려드려요.',
+  },
+  {
+    ready: true,
+    part: 'after',
+    slug: 'dividend',
+    railLabel: '배당',
+    heading: '가만히 있어도 돈이 들어와요?',
+    calc: 'dividend',
+    seoTitle: '배당금과 배당수익률, 세금 떼면 얼마 받나요?',
+    seoDescription:
+      '배당수익률은 주가가 내리면 올라가요. 세금을 떼고 실제로 얼마가 들어오는지 주식개미 주미가 배당 계산기로 보여드려요.',
+  },
+  {
+    ready: true,
+    part: 'after',
+    slug: 'risky-products',
+    railLabel: '위험한 상품',
+    heading: '2배, 인버스, 월배당?',
+    calc: 'decay',
+    seoTitle: '레버리지·인버스·커버드콜, 사기 전에 알아야 할 것',
+    seoDescription:
+      '2배 상품은 지수가 제자리로 돌아와도 마이너스예요. 곱버스와 커버드콜 월배당이 무엇을 대가로 받는 돈인지 주식개미 주미가 숫자로 보여드려요.',
+  },
+  {
+    ready: true,
+    part: 'after',
+    slug: 'compound',
+    railLabel: '복리',
+    heading: '시간이 돈이 된다는 게 뭐예요?',
+    calc: 'compound',
+    seoTitle: '복리와 72법칙, 두 배 되는 데 몇 년 걸릴까',
+    seoDescription:
+      '72를 수익률로 나누면 돈이 두 배 되는 햇수가 나와요. 복리에서 제일 센 게 수익률이 아니라 시간인 이유를 주미가 계산기로 보여드려요.',
+  },
+  {
+    ready: true,
+    part: 'after',
+    slug: 'savings-goal',
+    railLabel: '목표 세우기',
+    heading: '매달 얼마씩 넣어야 해요?',
+    calc: 'savings-goal',
+    seoTitle: '목표 금액에서 거꾸로 — 매달 얼마를 넣어야 하나',
+    seoDescription:
+      '‘10년 뒤 1억’을 정하면 매달 얼마가 필요한지 나와요. 막연한 계획을 숫자로 바꾸는 법을 주식개미 주미가 알려드려요.',
   },
 ];
 
@@ -174,4 +280,34 @@ export function findNextLesson(slug: string): Lesson | undefined {
 /** 레슨 slug 를 실제 경로로. */
 export function lessonPath(slug: string): string {
   return `/${slug}`;
+}
+
+/** 스텝 네비 한 부(部). `number` 는 전체를 통틀어 몇 번째인지 — 부가 바뀌어도 이어진다. */
+export interface PartGroup {
+  id: PartId;
+  label: string;
+  steps: readonly { step: Step; number: number }[];
+}
+
+/**
+ * STEPS 를 부 단위로 묶는다.
+ *
+ * 순서는 PARTS 가 아니라 STEPS 를 따른다 — 두 배열이 어긋나도 화면에 뜨는 순서는
+ * 커리큘럼 그대로여야 하고, 어느 부에도 못 들어간 단계가 조용히 사라지면 안 된다.
+ */
+export function groupStepsByPart(): PartGroup[] {
+  const groups = new Map<PartId, { step: Step; number: number }[]>();
+
+  STEPS.forEach((step, index) => {
+    const bucket = groups.get(step.part);
+    const entry = { step, number: index + 1 };
+    if (bucket) bucket.push(entry);
+    else groups.set(step.part, [entry]);
+  });
+
+  return [...groups].map(([id, steps]) => ({
+    id,
+    label: PARTS.find((part) => part.id === id)?.label ?? '',
+    steps,
+  }));
 }

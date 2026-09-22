@@ -1,12 +1,18 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import LessonCalc from '@/components/calc/LessonCalc';
 import JumiAvatar from '@/components/jumi/JumiAvatar';
 import SpeechBubble from '@/components/jumi/SpeechBubble';
 import TypingIndicator from '@/components/jumi/TypingIndicator';
 import { JUMI_ART } from '@/domain/jumi/artwork';
 import { buildDialogueSegments } from '@/domain/jumi/dialogueSegments';
-import { CHOICE_GROUP_LABEL, CHOICE_HINT, FIGURES_NOTICE } from '@/domain/jumi/landingCopy';
+import {
+  CALC_NOTICE,
+  CHOICE_GROUP_LABEL,
+  CHOICE_HINT,
+  FIGURES_NOTICE,
+} from '@/domain/jumi/landingCopy';
 import type { Lesson } from '@/domain/jumi/lessons';
 import type { ChoiceOption, ChoicePoint, JumiLine, TrackId } from '@/domain/jumi/types';
 
@@ -26,6 +32,10 @@ const CHOICE_DELAY_MS = 320;
 
 const ROW = 'flex items-start gap-2 md:gap-3';
 const AVATAR_SLOT = 'size-9 shrink-0 md:size-10';
+
+/** 레슨 하단 고지 — 계산기 유무에 따라 문구만 갈리고 모양은 같다. */
+const NOTICE_SHAPE =
+  'mt-6 rounded-xl border border-cb-border bg-cb-tile px-4 py-3 text-xs leading-relaxed text-cb-muted md:mt-8 md:px-5 md:py-4 md:text-sm';
 
 /**
  * 지금 트랙에서 실제로 할 대사만. 트랙이 안 붙은 대사는 항상 포함된다.
@@ -68,6 +78,20 @@ export default function LessonSection({
 
   /** 켜진 트랙. 트랙을 켜는 선택지는 레슨당 하나뿐이라 처음 것을 쓴다. */
   const activeTrack = picked.find((option) => option.track)?.track;
+
+  /**
+   * 계산기를 여는 시점 — 마지막 묶음의 대사가 전부 올라온 뒤다.
+   *
+   * 처음부터 보여주면 주미가 말하는 동안 아래에서 입력칸이 시선을 끌고, 대화를
+   * 건너뛴 채로 숫자만 만지게 된다. 그러면 '평단이 내려간다'만 보고 이 레슨이
+   * 말하려던 나머지 절반을 놓친다.
+   *
+   * 단, 잠겨 있는 동안에도 DOM 에는 둔다 — 대사와 같은 규칙이고, '평단 계산기'
+   * 자체가 검색어라 색인에서 빠지면 안 된다.
+   */
+  const lastIndex = segments.length - 1;
+  const lastLineCount = linesForTrack(segments[lastIndex]?.lines ?? [], activeTrack).length;
+  const calcOpen = picked.length >= lastIndex && shownLines >= lastLineCount;
 
   useEffect(() => {
     const segment = segments[picked.length];
@@ -198,10 +222,23 @@ export default function LessonSection({
         })}
       </ol>
 
-      {lesson.figuresNotice && (
-        <p className="mt-6 rounded-xl border border-cb-border bg-cb-tile px-4 py-3 text-xs leading-relaxed text-cb-muted md:mt-8 md:px-5 md:py-4 md:text-sm">
-          {FIGURES_NOTICE}
-        </p>
+      {/*
+        계산기와 그 고지는 한 덩어리로 잠근다. 고지만 먼저 뜨면 '계산기에 미리 채워둔
+        값은…' 이라고 말하는데 계산기는 아직 없는 상태가 된다.
+      */}
+      {lesson.calc !== undefined && (
+        <div className="mt-3 md:mt-4" data-locked={calcOpen ? undefined : ''} hidden={!calcOpen}>
+          <LessonCalc calc={lesson.calc} />
+          <p className={NOTICE_SHAPE}>{CALC_NOTICE}</p>
+        </div>
+      )}
+
+      {/*
+        계산기가 없는 레슨의 고지. 문구가 다르다 — FIGURES_NOTICE 는 '숫자를 일부러
+        적지 않았다'고 말하는데, 계산기가 있으면 그 말이 거짓이 된다.
+      */}
+      {lesson.figuresNotice === true && lesson.calc === undefined && (
+        <p className={NOTICE_SHAPE}>{FIGURES_NOTICE}</p>
       )}
     </article>
   );

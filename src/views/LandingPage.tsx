@@ -4,7 +4,7 @@ import LessonSection from '@/components/landing/LessonSection';
 import StepRail from '@/components/landing/StepRail';
 import HomeLink from '@/components/layout/HomeLink';
 import SiteFooter from '@/components/layout/SiteFooter';
-import { findNextLesson, lessonPath, type Lesson } from '@/domain/jumi/lessons';
+import type { Lesson } from '@/domain/jumi/lessons';
 import { LESSON_CHOICES, LESSON_LINES } from '@/domain/jumi/scripts';
 
 interface LandingPageProps {
@@ -19,8 +19,6 @@ interface LandingPageProps {
  * 대화가 가로로 길어지면 카톡 같은 느낌이 사라지고 읽기도 나빠진다.
  */
 export default function LandingPage({ lesson }: LandingPageProps) {
-  const next = findNextLesson(lesson.slug);
-
   return (
     <>
       <main className="mx-auto w-full max-w-md md:max-w-2xl">
@@ -37,7 +35,7 @@ export default function LandingPage({ lesson }: LandingPageProps) {
           choices={LESSON_CHOICES[lesson.slug]}
           headingLevel={2}
         />
-        <CtaSection href={next && lessonPath(next.slug)} />
+        <CtaSection slug={lesson.slug} />
       </main>
 
       <SiteFooter width="reading" />

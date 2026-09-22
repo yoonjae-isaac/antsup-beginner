@@ -1,13 +1,19 @@
 import type { ChoicePoint, JumiLine } from '../types';
 import * as accountTypes from './accountTypes';
 import * as afterBuy from './afterBuy';
+import * as averaging from './averaging';
 import * as beforeBuying from './beforeBuying';
 import * as broker from './broker';
 import * as buySell from './buySell';
+import * as compound from './compound';
+import * as dividend from './dividend';
 import * as etf from './etf';
 import * as krVsUs from './krVsUs';
 import * as mindset from './mindset';
+import * as riskyProducts from './riskyProducts';
+import * as savingsGoal from './savingsGoal';
 import * as stockBasics from './stockBasics';
+import * as stopLoss from './stopLoss';
 import * as taxFee from './taxFee';
 import * as terms from './terms';
 
@@ -45,6 +51,15 @@ export const LESSON_LINES: Record<string, readonly JumiLine[]> = {
   'kr-vs-us': krVsUs.LINES,
   terms: terms.LINES,
   'after-buy': afterBuy.LINES,
+
+  // 2부 — 사고 난 뒤. 이 다섯은 원본이 cash-bite 의 학습 글이라, 각 파일 머리에
+  // 어느 글에서 왔고 무엇을 빠뜨리면 안 되는지 적어 뒀다.
+  averaging: averaging.LINES,
+  'stop-loss': stopLoss.LINES,
+  dividend: dividend.LINES,
+  'risky-products': riskyProducts.LINES,
+  compound: compound.LINES,
+  'savings-goal': savingsGoal.LINES,
 };
 
 /** 레슨 slug → 사용자 선택지. */
@@ -60,4 +75,11 @@ export const LESSON_CHOICES: Record<string, readonly ChoicePoint[]> = {
   'kr-vs-us': krVsUs.CHOICES,
   terms: terms.CHOICES,
   'after-buy': afterBuy.CHOICES,
+
+  averaging: averaging.CHOICES,
+  'stop-loss': stopLoss.CHOICES,
+  dividend: dividend.CHOICES,
+  'risky-products': riskyProducts.CHOICES,
+  compound: compound.CHOICES,
+  'savings-goal': savingsGoal.CHOICES,
 };
