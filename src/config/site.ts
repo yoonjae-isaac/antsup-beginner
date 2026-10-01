@@ -26,6 +26,7 @@ import { CALENDAR_PATH } from '@/domain/calendar/route';
 import { INVESTORS_PATH } from '@/domain/investors/route';
 import { MACRO_PATH } from '@/domain/macro/route';
 import { NEWS_PATH } from '@/domain/news/route';
+import { TOOLS_PATH } from '@/domain/tools/route';
 
 /** 홈(서비스 허브)의 SEO 문구. 레슨별 문구는 lessons.ts 가 소유한다. */
 export const SEO = {
@@ -97,6 +98,14 @@ export function investorsMetadata(): Metadata {
     INVESTORS_PATH,
     '투자자들 현황 · step-ants',
     '버핏을 비롯한 거장들이 분기마다 공개하는 보유 종목(13F)을 정리했어요. 지금 들고 있다는 뜻은 아니라는 점까지 같이 알려드립니다.',
+  );
+}
+
+export function toolsMetadata(): Metadata {
+  return hubPageMetadata(
+    TOOLS_PATH,
+    '투자 도구 · step-ants',
+    '평단·손절가·배당·복리까지, 레슨에 나온 계산기를 한자리에 모았어요. 숫자를 직접 넣어 보면 설명이 훨씬 빨리 붙어요.',
   );
 }
 

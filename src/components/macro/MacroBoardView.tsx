@@ -4,7 +4,7 @@ import { useState } from 'react';
 import SegmentedControl from '@/components/common/SegmentedControl';
 import JumiAvatar from '@/components/jumi/JumiAvatar';
 import { JUMI_ART } from '@/domain/jumi/artwork';
-import { MACRO_HEADLINE_IDS, type MacroBoard, type MacroIndicator } from '@/domain/macro/macro';
+import { pickHeadlines, type MacroBoard, type MacroIndicator } from '@/domain/macro/macro';
 
 interface MacroBoardViewProps {
   board: MacroBoard;
@@ -22,10 +22,7 @@ const MACRO_NOTE =
 export default function MacroBoardView({ board }: MacroBoardViewProps) {
   const [category, setCategory] = useState(ALL);
 
-  const headlines = MACRO_HEADLINE_IDS.flatMap((id) => {
-    const found = board.indicators.find((item) => item.id === id);
-    return found ? [found] : [];
-  });
+  const headlines = pickHeadlines(board.indicators);
 
   const rows =
     category === ALL

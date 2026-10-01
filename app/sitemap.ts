@@ -5,6 +5,7 @@ import { CALENDAR_PATH } from '@/domain/calendar/route';
 import { INVESTORS_PATH } from '@/domain/investors/route';
 import { MACRO_PATH } from '@/domain/macro/route';
 import { NEWS_PATH } from '@/domain/news/route';
+import { TOOLS_PATH } from '@/domain/tools/route';
 
 // /sitemap.xml — 국내 전용 단일 로케일이라 hreflang alternates 없이 ko 단일 URL 이다.
 // 대사가 있는 레슨만 LESSONS 에 등록되므로, 빈 페이지가 여기 실릴 일은 없다.
@@ -42,6 +43,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: new URL(INVESTORS_PATH, SITE_URL).toString(),
       lastModified,
       changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    // 계산기는 바깥 데이터를 안 보므로 내용이 바뀌는 건 레슨이 늘 때뿐이다.
+    {
+      url: new URL(TOOLS_PATH, SITE_URL).toString(),
+      lastModified,
+      changeFrequency: 'monthly',
       priority: 0.85,
     },
     ...LESSONS.map((lesson) => ({

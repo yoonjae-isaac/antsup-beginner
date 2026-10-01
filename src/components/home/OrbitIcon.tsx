@@ -64,6 +64,23 @@ export default function OrbitIcon({ name }: OrbitIconProps) {
           <ellipse cx="12" cy="12" rx="4" ry="8.5" />
         </>
       )}
+
+      {/*
+        자판 여섯 개는 길이 0 인 선이다. strokeLinecap='round' 가 그걸 동그란 점으로
+        그려 준다 — <circle> 로 찍으면 fill='none' 때문에 속이 빈 동그라미가 된다.
+      */}
+      {name === 'calculator' && (
+        <>
+          <rect x="4.5" y="3" width="15" height="18" rx="2.5" />
+          <rect x="8" y="6.4" width="8" height="2.6" rx="0.8" />
+          <path d="M9.3 12.6h.01" />
+          <path d="M12 12.6h.01" />
+          <path d="M14.7 12.6h.01" />
+          <path d="M9.3 16.6h.01" />
+          <path d="M12 16.6h.01" />
+          <path d="M14.7 16.6h.01" />
+        </>
+      )}
     </svg>
   );
 }

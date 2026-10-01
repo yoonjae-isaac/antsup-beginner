@@ -29,13 +29,29 @@ export interface MacroBoard {
   categories: readonly string[];
 }
 
-/** 카드로 세울 대표 지표. 카탈로그 id 를 그대로 쓴다. */
+/**
+ * 카드로 세울 대표 지표. 카탈로그 id 를 그대로 쓴다.
+ * 거시 지표 페이지 상단과 홈 프리뷰 카드가 같은 넷을 본다.
+ */
 export const MACRO_HEADLINE_IDS = [
   'us-cpi',
   'us-unemployment',
-  'us-fed-rate',
   'us-treasury-10y',
+  'us-treasury-2y',
 ] as const;
+
+/**
+ * 홈 카드에서 쓰는 짧은 이름.
+ *
+ * 카탈로그 label('미국 10년물 국채 수익률')은 좁은 칸에서 잘린다. 잘린 이름은
+ * 틀린 이름이라, 줄여 쓸 말을 여기서 정해 둔다. 없는 id 는 원래 label 로 떨어진다.
+ */
+export const MACRO_HEADLINE_SHORT_LABEL: Record<string, string> = {
+  'us-cpi': '미국 물가 (CPI)',
+  'us-unemployment': '미국 실업률',
+  'us-treasury-10y': '미국 10년 국채',
+  'us-treasury-2y': '미국 2년 국채',
+};
 
 /** 목록에서 쓰는 분류 순서. 백엔드 카테고리 문자열과 같아야 한다. */
 const CATEGORY_ORDER = ['물가', '고용', '금리', 'GDP', '소비', '주택'];
@@ -140,4 +156,21 @@ export async function loadMacroBoard(): Promise<MacroBoard> {
   const categories = CATEGORY_ORDER.filter((name) => present.has(name));
 
   return { indicators, categories };
+}
+
+/**
+ * 대표 지표만 MACRO_HEADLINE_IDS 순서대로. 아직 안 받아온 지표는 빠진다.
+ * 거시 지표 페이지 상단과 홈 카드가 같은 함수를 봐야 둘이 어긋나지 않는다.
+ */
+export function pickHeadlines(indicators: readonly MacroIndicator[]): MacroIndicator[] {
+  return MACRO_HEADLINE_IDS.flatMap((id) => {
+    const found = indicators.find((item) => item.id === id);
+    return found ? [found] : [];
+  });
+}
+
+/** 홈 프리뷰용 — 네 칸만 필요할 때. 하나도 못 받으면 빈 배열이고, 그때 카드는 사라진다. */
+export async function loadMacroHeadlines(): Promise<readonly MacroIndicator[]> {
+  const board = await loadMacroBoard();
+  return pickHeadlines(board.indicators);
 }

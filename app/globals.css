@@ -187,25 +187,24 @@
   /*
    * 홈 좌측 컨텐츠 프리뷰.
    *
-   * 카드 마크업은 한 벌이고, 어느 카드가 앞인지는 트랙의 data-front 하나로 정한다.
-   * 모바일은 옆으로 미는 트랙, lg 부터는 카드가 겹쳐 쌓인 덱 — 레이아웃마다 카드를
-   * 따로 두면 같은 시세와 같은 명언이 HTML 에 두 번 실린다.
+   * 카드 마크업은 한 벌이고, 자리는 숫자 둘로만 정한다 — 트랙의 --front(지금 몇
+   * 번째가 앞인지)와 카드의 data-depth(앞장에서 몇 장 뒤인지). 카드 수에 맞춰
+   * 선택자를 늘려 쓰지 않는 이유는, 넉 장이 되자 nth-child 조합이 열두 줄로
+   * 불어났기 때문이다. 모바일은 옆으로 미는 트랙, lg 부터는 겹쳐 쌓인 덱 —
+   * 레이아웃마다 카드를 따로 두면 같은 시세와 같은 명언이 HTML 에 두 번 실린다.
    */
   /*
    * 두 레이아웃을 겹치지 않는 미디어쿼리로 완전히 갈라 둔다.
    * 공통 규칙을 두고 lg 에서 되돌리는 방식은 쓰지 않는다 — 미디어쿼리는 특정도를
-   * 올려주지 않아서, .preview-track[data-front='1'](0,2,0) 의 translateX 를
-   * .preview-track(0,1,0) 의 transform:none 으로 못 덮는다.
+   * 올려주지 않아서, .preview-card[data-depth='1'](0,2,0) 의 transform 을
+   * .preview-card(0,1,0) 의 transform:none 으로 못 덮는다.
    * 실제로 그렇게 짰다가 PC 에서 덱이 통째로 화면 밖으로 밀려났다.
    */
   @media (width < 64rem) {
     .preview-track {
       display: flex;
       transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .preview-track[data-front='1'] {
-      transform: translateX(-100%);
+      transform: translateX(calc(var(--front, 0) * -100%));
     }
 
     .preview-card {
@@ -233,19 +232,27 @@
     }
 
     /* 앞장 */
-    .preview-track[data-front='0'] > .preview-card:nth-child(1),
-    .preview-track[data-front='1'] > .preview-card:nth-child(2) {
+    .preview-card[data-depth='0'] {
       transform: translate3d(0, 0, 0) rotateX(0deg);
       opacity: 1;
       z-index: 20;
     }
 
     /* 뒷장 — 아래를 축으로 젖혀지며 물러난다. */
-    .preview-track[data-front='0'] > .preview-card:nth-child(2),
-    .preview-track[data-front='1'] > .preview-card:nth-child(1) {
+    .preview-card[data-depth='1'] {
       transform: translate3d(0, -26px, -110px) rotateX(7deg);
       opacity: 0.42;
       z-index: 10;
+    }
+
+    /*
+     * 그보다 뒤. 뒷장과 같은 자리에 두고 투명하게만 만든다 — 자리가 같아야
+     * 앞으로 나올 때 뒷장 위치에서 올라오고, 덱이 3·4장만큼 두꺼워 보이지 않는다.
+     */
+    .preview-card[data-depth='2'] {
+      transform: translate3d(0, -26px, -110px) rotateX(7deg);
+      opacity: 0;
+      z-index: 1;
     }
   }
 }

@@ -5,6 +5,7 @@ import OrbitIcon from '@/components/home/OrbitIcon';
 import { JUMI_ART } from '@/domain/jumi/artwork';
 import {
   DIRECTION_VECTOR,
+  floatDelayMs,
   ORBIT_EMPTY_DIRECTIONS,
   ORBIT_ENTRIES,
   type OrbitDirection,
@@ -21,9 +22,6 @@ const INNER_RING_UNITS = 23;
 /** 중심에서 뻗는 연결선. 아바타 밖에서 시작해 버튼 앞에서 끝난다. */
 const LINE_START = 17;
 const LINE_END = 27.5;
-
-/** 노드마다 이만큼씩 어긋나게 띄운다. 동시에 움직이면 떠 있는 느낌이 죽는다. */
-const FLOAT_STAGGER_MS = 700;
 
 function slotStyle(direction: OrbitDirection, delayMs?: number): CSSProperties {
   const vector = DIRECTION_VECTOR[direction];
@@ -108,7 +106,7 @@ export default function OrbitHub() {
 
       <nav aria-label={ORBIT_NAV_LABEL}>
         <ul>
-          {ORBIT_ENTRIES.map((entry, index) => {
+          {ORBIT_ENTRIES.map((entry) => {
             const shell = `group flex w-[92px] flex-col items-center gap-2.5 rounded-2xl border-0 bg-transparent p-0 text-cb-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cb-point lg:w-auto lg:flex-row lg:gap-3 lg:rounded-full lg:py-2.5 lg:pr-5 lg:pl-2.5 lg:transition-colors ${
               entry.href ? 'cursor-pointer' : 'cursor-default'
             } ${
@@ -144,7 +142,7 @@ export default function OrbitHub() {
               <li
                 key={entry.id}
                 className="orbit-slot orbit-node"
-                style={slotStyle(entry.direction, index * FLOAT_STAGGER_MS)}
+                style={slotStyle(entry.direction, floatDelayMs(entry.direction))}
               >
                 {entry.href ? (
                   <Link href={entry.href} className={shell}>

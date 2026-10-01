@@ -2,11 +2,16 @@ import ContentPreview from '@/components/home/ContentPreview';
 import OrbitHub from '@/components/home/OrbitHub';
 import SiteFooter from '@/components/layout/SiteFooter';
 import { HOME_EYEBROW, HOME_HEADING, ORBIT_EMPTY_HINT } from '@/domain/jumi/landingCopy';
+import type { MacroIndicator } from '@/domain/macro/macro';
 import type { MarketSnapshot } from '@/domain/preview/market';
 import { INVESTOR_QUOTES, pickDailyQuote } from '@/domain/preview/quotes';
+import type { TodaySchedule } from '@/domain/preview/schedule';
 
 interface HomePageProps {
   market: MarketSnapshot | null;
+  /** 오늘 일정이 없는 날(주말 등)에는 null — 그 카드만 빠진다. */
+  schedule: TodaySchedule | null;
+  macro: readonly MacroIndicator[];
 }
 
 /**
@@ -17,7 +22,7 @@ interface HomePageProps {
  * lg 부터는 좌측을 컨텐츠 프리뷰로 세워 2단이 된다 — 좁은 화면에서 그대로 키우기만
  * 하면 링이 화면을 다 먹고 나머지가 밀려난다.
  */
-export default function HomePage({ market }: HomePageProps) {
+export default function HomePage({ market, schedule, macro }: HomePageProps) {
   const { quote, index } = pickDailyQuote();
 
   return (
@@ -40,10 +45,12 @@ export default function HomePage({ market }: HomePageProps) {
 
           <div className="order-1 lg:order-2">
             <ContentPreview
+              macro={macro}
               market={market}
               quote={quote}
               quoteIndex={index}
               quoteTotal={INVESTOR_QUOTES.length}
+              schedule={schedule}
             />
           </div>
         </section>

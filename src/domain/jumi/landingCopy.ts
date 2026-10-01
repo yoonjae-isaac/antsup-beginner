@@ -24,7 +24,7 @@ export const HOME_EYEBROW = 'step-ants';
 export const HOME_HEADING = '어디부터 가볼까요?';
 export const HOME_LEAD = '주미를 가운데 두고 여덟 방향으로 길을 냈어요. 필요한 곳을 바로 고르면 돼요.';
 export const ORBIT_NAV_LABEL = '서비스 바로가기';
-export const ORBIT_EMPTY_HINT = '빈 자리 세 곳은 아직 준비 중이에요';
+export const ORBIT_EMPTY_HINT = '빈 자리 두 곳은 아직 준비 중이에요';
 
 /**
  * 홈 좌측 컨텐츠 프리뷰 — 환율·시장 카드와 오늘의 명언 카드.
@@ -38,8 +38,21 @@ export const PREVIEW_INDEX_HEADING = '오늘 지수';
 /** 상승·하락 색이 나라마다 반대라, 이 화면이 어느 쪽인지는 글로도 남긴다. */
 // 색 규칙은 globals.css 한 곳에서 정한다(오른 쪽이 빨강). 이 문구가 그걸 따라가야 한다.
 export const PREVIEW_UPDOWN_NOTE = '상승 빨강 · 하락 파랑으로 보고 있어요';
+/** 오늘 증시 일정 카드 — 공모는 담지 않는다(홈에서 할 수 있는 일이 없다). */
+export const PREVIEW_SCHEDULE_TITLE = '오늘 증시 일정';
+export const PREVIEW_SCHEDULE_MORE = (total: number) => `오늘 ${total}건 · 전체 일정 보기 →`;
+
+/** 거시 지표 카드 — 지표 페이지 상단과 같은 넷. */
+export const PREVIEW_MACRO_TITLE = '거시 지표';
+export const PREVIEW_MACRO_FRESHNESS = '하루 한 번 갱신';
+export const PREVIEW_MACRO_MORE = '대표 네 가지 · 전체 지표 보기 →';
+
 export const PREVIEW_QUOTE_TITLE = '오늘의 명언';
-export const PREVIEW_AUTO_HINT = '3초마다 다음 카드로';
+export const PREVIEW_AUTO_HINT = '5초마다 다음 카드로';
+/** 직접 넘긴 뒤에는 자동 전환을 멈춘다 — 읽는 중에 카드가 넘어가면 안 된다. */
+export const PREVIEW_MANUAL_HINT = '버튼으로 넘겨 보세요';
+export const PREVIEW_PREV_LABEL = '이전 카드';
+export const PREVIEW_NEXT_LABEL = '다음 카드';
 
 /** 눌러야 대화가 이어진다는 걸 알려주는 안내. 없으면 멈춘 화면으로 오해한다. */
 export const CHOICE_HINT = '답장을 골라 대화를 이어가세요';

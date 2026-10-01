@@ -51,7 +51,17 @@ const HOUR_LABEL: Record<string, string> = {
   amc: '장 마감 후',
 };
 
-function kstToday(now: Date): string {
+/** 모르는 코드는 null — 틀린 시각보다 없는 편이 낫다. */
+export function hourLabel(hour: string): string | null {
+  return HOUR_LABEL[hour] ?? null;
+}
+
+/**
+ * 오늘(KST) 날짜 문자열. 백엔드가 주는 date 와 같은 'YYYY-MM-DD' 모양이다.
+ * 홈 프리뷰(domain/preview/schedule.ts)도 같은 기준을 써야 해서 내보낸다 —
+ * 시간대 처리를 두 벌 두면 서버 위치에 따라 둘이 하루씩 어긋난다.
+ */
+export function kstToday(now: Date): string {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: KST,
     year: 'numeric',
@@ -89,7 +99,7 @@ function impactLabel(impact: string): { text: string; important: boolean } {
  * 국내는 DART 가 기업명을 같이 준다. 미국은 심볼만 와서 'MU' 가 제목이 되는데,
  * 초보에게 세 글자 약자는 아무것도 아니라 한글 종목명을 찾아 앞에 세운다.
  */
-function earningTitle(symbol: string, name?: string): string {
+export function earningTitle(symbol: string, name?: string): string {
   if (name && name.trim() !== '') return name;
   return koreanSymbolName(symbol) ?? symbol;
 }
@@ -119,7 +129,7 @@ function toItems(week: CalendarWeekResponse, date: string, logos: Record<string,
       title: earningTitle(row.symbol, row.name),
       // 제목이 한글 이름으로 바뀌면 심볼이 화면에서 사라진다. 찾아볼 수 있게 남겨 둔다.
       note: `${row.symbol} · 지난 분기 성적표를 내는 날이에요.`,
-      when: HOUR_LABEL[row.hour] ?? null,
+      when: hourLabel(row.hour),
       meta: row.epsEstimate == null ? '예상치 없음' : `EPS 예상 ${row.epsEstimate.toFixed(2)}`,
       important: false,
       ticker: row.symbol,

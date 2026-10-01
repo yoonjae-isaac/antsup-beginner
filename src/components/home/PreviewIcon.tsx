@@ -1,4 +1,4 @@
-type PreviewIconKey = 'market' | 'quote';
+type PreviewIconKey = 'market' | 'schedule' | 'macro' | 'quote';
 
 interface PreviewIconProps {
   name: PreviewIconKey;
@@ -25,6 +25,24 @@ export default function PreviewIcon({ name }: PreviewIconProps) {
         <>
           <path d="M3.5 16.5 9 11l3.5 3.5L20.5 6.5" />
           <path d="M15.5 6.5h5v5" />
+        </>
+      )}
+
+      {/* 오비트의 같은 입구와 같은 그림이어야 한다 — 카드와 버튼이 같은 곳을 가리킨다. */}
+      {name === 'schedule' && (
+        <>
+          <rect x="3" y="5" width="18" height="16" rx="2.5" />
+          <path d="M8 3v4" />
+          <path d="M16 3v4" />
+          <path d="M3 10h18" />
+        </>
+      )}
+
+      {name === 'macro' && (
+        <>
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M3.5 12h17" />
+          <ellipse cx="12" cy="12" rx="4" ry="8.5" />
         </>
       )}
 
