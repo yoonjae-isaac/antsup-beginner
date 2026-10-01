@@ -95,13 +95,37 @@ function formatValue(value: number, unit: string): string {
 }
 
 /**
- * 변동 표기.
- * Percent 단위 지표의 변동은 %가 아니라 %p 다 — 4.1%에서 4.3%로 간 걸 '+4.9%'로
- * 적으면 완전히 다른 뜻이 된다.
+ * 화면에 쓸 변동값.
+ *
+ * 백엔드의 yoyChange 는 **상대 변화율**이다 — (최신 − 1년 전) ÷ 1년 전 × 100
+ * (cash-bite-backend `macro.service.ts` calculateMeta). 지수형 지표는 그 값이
+ * 그대로 '작년보다 몇 %'라 맞다. 그런데 단위가 Percent 인 지표(실업률·금리)에
+ * 같은 숫자를 쓰면서 꼬리만 %p 로 바꿔 달면 완전히 다른 뜻이 된다 —
+ * 2년물이 3.57% 에서 4.92% 로 간 걸 '+37.8%p' 라고 적으면 금리가 1년 새
+ * 37.8%포인트 올랐다는 말이 되지만, 실제로 오른 건 1.35%p 다.
+ *
+ * 그래서 Percent 지표만 상대 변화율을 되돌려 퍼센트포인트로 바꾼다.
+ *   1년 전 = 최신 ÷ (1 + 변화율),  %p = 최신 − 1년 전
+ *
+ * 값이 음수일 수 있는 지표(장단기 금리차)에서는 부호까지 갈린다 — −0.2 에서
+ * −0.5 로 간 것은 상대 변화율로 +150% 지만 실제로는 0.3%p 내린 것이다.
+ * 색과 화살표도 이 값에서 뽑아야 하는 이유다.
  */
-function formatChange(yoy: number, unit: string): string {
-  const sign = yoy > 0 ? '+' : '';
-  return isPercentUnit(unit) ? `${sign}${yoy.toFixed(1)}%p` : `${sign}${yoy.toFixed(1)}%`;
+function changeOf(value: number, yoy: number | null, unit: string): number | null {
+  if (yoy == null) return null;
+  if (!isPercentUnit(unit)) return yoy;
+
+  const ratio = 1 + yoy / 100;
+  // 1년 전이 0 이면 백엔드가 yoyChange 를 null 로 준다. 그래도 0 나눗셈은 막아 둔다.
+  if (ratio === 0) return null;
+
+  return value - value / ratio;
+}
+
+/** Percent 지표는 퍼센트포인트로. 금리 움직임은 작아서 소수 둘째 자리까지 남긴다. */
+function formatChange(change: number, unit: string): string {
+  const sign = change > 0 ? '+' : '';
+  return isPercentUnit(unit) ? `${sign}${change.toFixed(2)}%p` : `${sign}${change.toFixed(1)}%`;
 }
 
 /**
@@ -122,7 +146,8 @@ function toIndicator(row: MacroOverviewResponse): MacroIndicator | null {
   const { entry, latest } = row;
   if (latest.value == null || latest.date == null) return null;
 
-  const yoy = latest.yoyChange;
+  // 백엔드가 준 상대 변화율이 아니라, 이 지표에 맞는 단위로 바꾼 값을 쓴다.
+  const change = changeOf(latest.value, latest.yoyChange, entry.unit);
 
   return {
     id: entry.id,
@@ -130,8 +155,8 @@ function toIndicator(row: MacroOverviewResponse): MacroIndicator | null {
     label: entry.label,
     description: entry.description ?? '',
     value: formatValue(latest.value, entry.unit),
-    yoy: yoy == null ? null : formatChange(yoy, entry.unit),
-    direction: yoy == null ? null : yoy >= 0 ? 'up' : 'down',
+    yoy: change == null ? null : formatChange(change, entry.unit),
+    direction: change == null ? null : change >= 0 ? 'up' : 'down',
     asOf: formatAsOf(latest.date, entry.frequency),
     levelIsMeaningful: isPercentUnit(entry.unit),
   };
