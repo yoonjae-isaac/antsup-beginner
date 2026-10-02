@@ -1,6 +1,14 @@
 'use client';
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+  type PointerEvent,
+  type ReactNode,
+} from 'react';
 import BriefingCard from '@/components/home/BriefingCard';
 import MacroCard from '@/components/home/MacroCard';
 import MarketCard from '@/components/home/MarketCard';
@@ -50,12 +58,39 @@ const ROTATE_MS = 5000;
 const MAX_DEPTH = 2;
 
 /**
+ * 스와이프로 인정하는 최소 이동(px). 그보다 짧으면 제자리로 돌아간다.
+ * 카드가 통째로 링크라서, 누르려다 손가락이 조금 흐른 것을 넘기기로 읽으면 안 된다.
+ */
+const SWIPE_PX = 40;
+
+/** 가로인지 세로인지 정하는 데 필요한 최소 이동(px). 그 전까지는 아무것도 안 한다. */
+const AXIS_LOCK_PX = 8;
+
+/**
+ * 끝 카드에서 더 밀 때 손가락을 따라오는 비율.
+ *
+ * 버튼은 끝에서 반대편으로 돌지만 스와이프는 돌지 않는다. 손가락은 오른쪽으로
+ * 밀었는데 트랙이 왼쪽으로 넉 장을 달려가면 어디로 갔는지 놓친다. 대신 조금만
+ * 따라와서 '여기가 끝'이라고 알린다.
+ */
+const EDGE_RESISTANCE = 0.35;
+
+interface Gesture {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  /** null 이면 아직 방향이 안 정해진 것. 'y' 면 페이지 스크롤이라 손을 뗀다. */
+  axis: 'x' | 'y' | null;
+}
+
+/**
  * 홈 좌측의 컨텐츠 프리뷰.
  *
  * 카드가 몇 장인지는 백엔드에서 뭘 받아왔는지에 달렸다. 한 장뿐이면 돌릴 것도,
  * 고를 것도 없으므로 타이머와 조작부가 통째로 사라진다.
  * 움직임 자체(가로 슬라이드 / 덱)는 globals.css 의 .preview-* 가 맡고,
- * 여기서는 지금 몇 번째 카드가 앞인지만 정한다.
+ * 여기서는 지금 몇 번째 카드가 앞인지(--front)와, 모바일에서 손가락을 따라
+ * 끌려온 거리(--drag)만 정한다.
  */
 export default function ContentPreview({
   market,
@@ -121,6 +156,88 @@ export default function ContentPreview({
     setFront(((index % cards.length) + cards.length) % cards.length);
   }
 
+  const trackRef = useRef<HTMLDivElement>(null);
+  const gestureRef = useRef<Gesture | null>(null);
+  // 방금 스와이프한 손가락이 떨어질 때 따라오는 click 을 한 번 삼킨다.
+  // 카드가 링크라서, 안 삼키면 넘기려던 손길이 페이지 이동이 된다.
+  const swipedRef = useRef(false);
+
+  /**
+   * 끄는 동안의 오프셋은 React 상태로 두지 않는다. 손가락이 움직일 때마다 덱 전체를
+   * 다시 그릴 이유가 없어서 트랙의 --drag 만 직접 바꾼다. --front 는 React 가 갖고
+   * 있고 둘은 다른 속성이라 서로 덮지 않는다. data-dragging 은 CSS 가 전환을 끄는
+   * 신호다 — 500ms 전환이 켜진 채로는 트랙이 손가락보다 늦게 따라온다.
+   */
+  function setDrag(px: number, dragging: boolean) {
+    const track = trackRef.current;
+    if (!track) return;
+    track.style.setProperty('--drag', `${px}px`);
+    track.toggleAttribute('data-dragging', dragging);
+  }
+
+  function onPointerDown(event: PointerEvent<HTMLDivElement>) {
+    // 마우스는 받지 않는다. lg 의 덱은 옆으로 미는 구조가 아니고, 링크 위에서
+    // 마우스를 끌면 텍스트 선택과 겹친다. 터치와 펜만이다.
+    if (event.pointerType === 'mouse' || cards.length < 2) return;
+    swipedRef.current = false;
+    gestureRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      axis: null,
+    };
+  }
+
+  function onPointerMove(event: PointerEvent<HTMLDivElement>) {
+    const gesture = gestureRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+
+    const dx = event.clientX - gesture.startX;
+    const dy = event.clientY - gesture.startY;
+
+    if (gesture.axis === null) {
+      if (Math.abs(dx) < AXIS_LOCK_PX && Math.abs(dy) < AXIS_LOCK_PX) return;
+      gesture.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      // 손가락으로 넘기기 시작한 순간 자동 전환을 멈춘다 — 버튼과 같은 이유다.
+      if (gesture.axis === 'x') setManual(true);
+    }
+    if (gesture.axis !== 'x') return;
+
+    const atEdge = (dx > 0 && front === 0) || (dx < 0 && front === cards.length - 1);
+    setDrag(atEdge ? dx * EDGE_RESISTANCE : dx, true);
+  }
+
+  function onPointerUp(event: PointerEvent<HTMLDivElement>) {
+    const gesture = gestureRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+    gestureRef.current = null;
+    if (gesture.axis !== 'x') return;
+
+    swipedRef.current = true;
+    // --drag 를 0 으로 되돌리는 것과 --front 가 바뀌는 것이 같은 프레임에 들어간다
+    // (React 는 포인터 이벤트 안의 상태 변경을 핸들러가 끝날 때 바로 커밋한다).
+    // 그래서 끌려온 자리에서 새 카드까지 한 번의 전환으로 이어진다.
+    setDrag(0, false);
+    const dx = event.clientX - gesture.startX;
+    if (dx <= -SWIPE_PX && front < cards.length - 1) pick(front + 1);
+    else if (dx >= SWIPE_PX && front > 0) pick(front - 1);
+  }
+
+  function onPointerCancel(event: PointerEvent<HTMLDivElement>) {
+    // 브라우저가 세로 스크롤로 가져간 경우. 끌던 만큼 제자리로.
+    const gesture = gestureRef.current;
+    if (!gesture || gesture.pointerId !== event.pointerId) return;
+    gestureRef.current = null;
+    setDrag(0, false);
+  }
+
+  function onClickCapture(event: MouseEvent<HTMLDivElement>) {
+    if (!swipedRef.current) return;
+    swipedRef.current = false;
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
   return (
     <section aria-label={PREVIEW_NAV_LABEL}>
       {/*
@@ -132,8 +249,23 @@ export default function ContentPreview({
         좁은 화면 높이는 가장 빡빡한 카드(장전 브리핑)가 정한다 — 머리줄 + 요약 네 줄 +
         밑줄이 들어가야 해서 192px 로는 마지막 줄이 밑줄에 가려졌다.
       */}
-      <div className="preview-viewport h-[204px] overflow-hidden lg:h-[470px] lg:overflow-visible">
-        <div className="preview-track h-full" style={{ '--front': front } as CSSProperties}>
+      {/*
+        touch-pan-y: 세로는 브라우저가 페이지를 스크롤하고, 가로만 여기로 온다.
+        이게 없으면 브라우저가 가로 움직임도 가져가서 pointermove 가 끊긴다.
+      */}
+      <div
+        className="preview-viewport h-[204px] touch-pan-y overflow-hidden max-lg:select-none lg:h-[470px] lg:overflow-visible"
+        onClickCapture={onClickCapture}
+        onPointerCancel={onPointerCancel}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+      >
+        <div
+          className="preview-track h-full"
+          ref={trackRef}
+          style={{ '--front': front } as CSSProperties}
+        >
           {cards.map((card, index) => {
             const behind = (index - front + cards.length) % cards.length;
 
