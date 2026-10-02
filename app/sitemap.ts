@@ -4,6 +4,7 @@ import { LESSONS, lessonPath } from '@/domain/jumi/lessons';
 import { CALENDAR_PATH } from '@/domain/calendar/route';
 import { INVESTORS_PATH } from '@/domain/investors/route';
 import { MACRO_PATH } from '@/domain/macro/route';
+import { BRIEFING_ARCHIVE_PATH, BRIEFING_PATH } from '@/domain/briefing/route';
 import { NEWS_PATH } from '@/domain/news/route';
 import { TOOLS_PATH } from '@/domain/tools/route';
 
@@ -44,6 +45,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: 'weekly',
       priority: 0.85,
+    },
+    // 장전 브리핑은 평일 아침마다 새 글로 바뀐다.
+    {
+      url: new URL(BRIEFING_PATH, SITE_URL).toString(),
+      lastModified,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: new URL(BRIEFING_ARCHIVE_PATH, SITE_URL).toString(),
+      lastModified,
+      changeFrequency: 'daily',
+      priority: 0.6,
     },
     // 계산기는 바깥 데이터를 안 보므로 내용이 바뀌는 건 레슨이 늘 때뿐이다.
     {

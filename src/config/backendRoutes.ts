@@ -184,6 +184,37 @@ export const GURU_REVALIDATE_SECONDS = 21600;
 /** 로고는 거의 안 바뀐다. 백엔드도 Redis 에 30일 들고 있다. */
 export const LOGO_REVALIDATE_SECONDS = 86400;
 
+/**
+ * `/briefing/daily` — 장전 브리핑 한 건.
+ *
+ * sections 안쪽은 출처(개미승리)가 준 모양 그대로라 타입을 박지 않는다.
+ * 실제로 날마다 구조가 바뀌는 섹션이 있어서, 고르는 일은 전부
+ * domain/briefing/briefing.ts 가 방어적으로 한다.
+ */
+export interface BriefingResponse {
+  briefingDate: string;
+  summaryLine: string;
+  sections?: {
+    topIssues?: unknown;
+    themeRadar?: unknown;
+    weeklySchedules?: unknown;
+    newThemes?: unknown;
+    riskMonitoring?: unknown;
+    scanChecklist?: unknown;
+    analystComment?: unknown;
+  };
+  fetchedAt: string;
+}
+
+/** `/briefing/list` 한 건. */
+export interface BriefingListResponse {
+  briefingDate: string;
+  summaryLine: string;
+}
+
+/** 브리핑은 평일 아침에 하루 한 번 올라온다. 한 시간이면 넉넉하다. */
+export const BRIEFING_REVALIDATE_SECONDS = 3600;
+
 export const BACKEND_ROUTES = {
   marketFx: defineEndpoint<FxResponse>({
     path: '/market/fx',
@@ -226,6 +257,19 @@ export const BACKEND_ROUTES = {
   guruStats: defineEndpoint<GuruStatsResponse>({
     path: '/disclosure/13f/stats',
     revalidate: GURU_REVALIDATE_SECONDS,
+  }),
+
+  /** date 가 빈 문자열이면 백엔드가 최신 글을 준다 — 휴장일 대비. */
+  briefingDaily: defineEndpoint<BriefingResponse, { date: string }>({
+    path: '/briefing/daily',
+    revalidate: BRIEFING_REVALIDATE_SECONDS,
+    query: ({ date }): Record<string, string> => (date === '' ? {} : { date }),
+  }),
+
+  briefingList: defineEndpoint<BriefingListResponse[], { limit: number }>({
+    path: '/briefing/list',
+    revalidate: BRIEFING_REVALIDATE_SECONDS,
+    query: ({ limit }) => ({ limit: String(limit) }),
   }),
 
   /**

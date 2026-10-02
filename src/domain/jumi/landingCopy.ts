@@ -24,7 +24,7 @@ export const HOME_EYEBROW = 'step-ants';
 export const HOME_HEADING = '어디부터 가볼까요?';
 export const HOME_LEAD = '주미를 가운데 두고 여덟 방향으로 길을 냈어요. 필요한 곳을 바로 고르면 돼요.';
 export const ORBIT_NAV_LABEL = '서비스 바로가기';
-export const ORBIT_EMPTY_HINT = '빈 자리 두 곳은 아직 준비 중이에요';
+export const ORBIT_EMPTY_HINT = '빈 자리 한 곳은 아직 준비 중이에요';
 
 /**
  * 홈 좌측 컨텐츠 프리뷰 — 환율·시장 카드와 오늘의 명언 카드.
@@ -46,6 +46,26 @@ export const PREVIEW_SCHEDULE_MORE = (total: number) => `오늘 ${total}건 · �
 export const PREVIEW_MACRO_TITLE = '거시 지표';
 export const PREVIEW_MACRO_FRESHNESS = '하루 한 번 갱신';
 export const PREVIEW_MACRO_MORE = '대표 네 가지 · 전체 지표 보기 →';
+
+/**
+ * 장전 브리핑 — 글을 쓴 곳이 우리가 아니다.
+ * 출처 표기는 선택이 아니라 이 화면이 성립하는 조건이라, 문구를 한곳에 모아 둔다.
+ */
+export const BRIEFING_HEADING = '장 시작 전에 보는 오늘';
+export const BRIEFING_LEAD =
+  '9시에 장이 열리기 전, 오늘 무슨 일이 예정돼 있는지 미리 훑어보는 자리예요.';
+export const BRIEFING_JUMI_LEAD = '어려운 말이 많아요. 맨 위 한 문단만 읽어도 오늘 분위기는 알 수 있어요.';
+export const BRIEFING_SOURCE_NAME = '개미승리';
+export const BRIEFING_SOURCE_URL = 'https://antwinner.com';
+/** 리드 문장 뒤에 이어 붙는다 — 출처를 별도 칸이 아니라 설명 문장 안에서 밝힌다. */
+export const BRIEFING_SOURCE_NOTE = '가 쓴 브리핑을 받아서 전해드려요.';
+export const BRIEFING_STOCK_NOTE = '관련 종목은 브리핑이 짚은 것일 뿐, 사라는 뜻이 아니에요.';
+export const BRIEFING_CLOSING_NOTE =
+  '이 페이지의 글은 개미승리가 작성한 것으로, 투자 권유가 아니에요. 원문에 들어 있던 매매 판단(비중·손절 등)은 싣지 않았습니다. 투자 판단과 그 결과는 투자자 본인에게 있습니다.';
+
+/** 홈 카드 — 장전 브리핑 한 문단만 싣는다. */
+export const PREVIEW_BRIEFING_TITLE = '장 시작 전';
+export const PREVIEW_BRIEFING_MORE = '브리핑 전체 보기 →';
 
 export const PREVIEW_QUOTE_TITLE = '오늘의 명언';
 export const PREVIEW_AUTO_HINT = '5초마다 다음 카드로';

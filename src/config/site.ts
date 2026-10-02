@@ -22,6 +22,7 @@ export const SITE_URL =
 
 import type { Metadata } from 'next';
 import { lessonPath, type Lesson } from '@/domain/jumi/lessons';
+import { BRIEFING_ARCHIVE_PATH, BRIEFING_PATH } from '@/domain/briefing/route';
 import { CALENDAR_PATH } from '@/domain/calendar/route';
 import { INVESTORS_PATH } from '@/domain/investors/route';
 import { MACRO_PATH } from '@/domain/macro/route';
@@ -98,6 +99,22 @@ export function investorsMetadata(): Metadata {
     INVESTORS_PATH,
     '투자자들 현황 · step-ants',
     '버핏을 비롯한 거장들이 분기마다 공개하는 보유 종목(13F)을 정리했어요. 지금 들고 있다는 뜻은 아니라는 점까지 같이 알려드립니다.',
+  );
+}
+
+export function briefingMetadata(): Metadata {
+  return hubPageMetadata(
+    BRIEFING_PATH,
+    '장전 브리핑 · step-ants',
+    '장이 열리기 전에 오늘 무슨 일이 예정돼 있는지 미리 훑어보세요. 오늘의 이슈와 움직일 테마, 지켜볼 위험까지 한 문단 요약과 함께 정리했어요.',
+  );
+}
+
+export function briefingArchiveMetadata(): Metadata {
+  return hubPageMetadata(
+    BRIEFING_ARCHIVE_PATH,
+    '지난 브리핑 · step-ants',
+    '날마다 장 시작 전에 올라온 브리핑을 모았어요. 그날 시장에 무슨 이야기가 많았는지 한 줄씩 돌아볼 수 있습니다.',
   );
 }
 

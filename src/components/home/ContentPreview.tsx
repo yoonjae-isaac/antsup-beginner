@@ -1,12 +1,15 @@
 'use client';
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import BriefingCard from '@/components/home/BriefingCard';
 import MacroCard from '@/components/home/MacroCard';
 import MarketCard from '@/components/home/MarketCard';
 import QuoteCard from '@/components/home/QuoteCard';
 import ScheduleCard from '@/components/home/ScheduleCard';
+import type { Briefing } from '@/domain/briefing/types';
 import {
   PREVIEW_AUTO_HINT,
+  PREVIEW_BRIEFING_TITLE,
   PREVIEW_MACRO_TITLE,
   PREVIEW_MANUAL_HINT,
   PREVIEW_MARKET_TITLE,
@@ -24,6 +27,7 @@ import type { InvestorQuote } from '@/domain/preview/quotes';
 interface ContentPreviewProps {
   /** 백엔드가 닿지 않으면 null — 그 카드만 빠지고 나머지는 그대로 돈다. */
   market: MarketSnapshot | null;
+  briefing: Briefing | null;
   schedule: TodaySchedule | null;
   macro: readonly MacroIndicator[];
   quote: InvestorQuote;
@@ -55,6 +59,7 @@ const MAX_DEPTH = 2;
  */
 export default function ContentPreview({
   market,
+  briefing,
   schedule,
   macro,
   quote,
@@ -62,6 +67,16 @@ export default function ContentPreview({
   quoteTotal,
 }: ContentPreviewProps) {
   const cards: { id: string; label: string; body: ReactNode }[] = [
+    // 장전 브리핑이 맨 앞이다 — 아침에 들어온 사람에게 오늘을 가장 먼저 말해 준다.
+    ...(briefing
+      ? [
+          {
+            id: 'briefing',
+            label: PREVIEW_BRIEFING_TITLE,
+            body: <BriefingCard briefing={briefing} />,
+          },
+        ]
+      : []),
     ...(market
       ? [{ id: 'market', label: PREVIEW_MARKET_TITLE, body: <MarketCard market={market} /> }]
       : []),
@@ -113,7 +128,11 @@ export default function ContentPreview({
         여기서 자르면 그만큼 잘려 나간다. 유틸리티로 적어야 하는 이유는
         globals.css 의 미디어쿼리보다 Tailwind 유틸리티가 나중에 적용되기 때문이다.
       */}
-      <div className="preview-viewport h-48 overflow-hidden lg:h-[470px] lg:overflow-visible">
+      {/*
+        좁은 화면 높이는 가장 빡빡한 카드(장전 브리핑)가 정한다 — 머리줄 + 요약 네 줄 +
+        밑줄이 들어가야 해서 192px 로는 마지막 줄이 밑줄에 가려졌다.
+      */}
+      <div className="preview-viewport h-[204px] overflow-hidden lg:h-[470px] lg:overflow-visible">
         <div className="preview-track h-full" style={{ '--front': front } as CSSProperties}>
           {cards.map((card, index) => {
             const behind = (index - front + cards.length) % cards.length;

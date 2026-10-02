@@ -1,7 +1,7 @@
 /**
  * 홈 오비트 — 주미를 중심에 두고 8방향으로 떠 있는 서비스 입구.
  *
- * 8칸 링을 먼저 정의하고 그중 여섯 칸을 채운다. 남는 두 칸은 점선으로 비워
+ * 8칸 링을 먼저 정의하고 그중 일곱 칸을 채운다. 남는 한 칸은 점선으로 비워
  * 두는데, 이건 미완성이 아니라 '여기에 더 붙는다'는 표시다. 서비스가 늘면
  * ORBIT_ENTRIES 에 추가하고 ORBIT_EMPTY_DIRECTIONS 에서 그 방향만 빼면 된다.
  *
@@ -11,6 +11,7 @@
 
 import { CALENDAR_PATH } from '@/domain/calendar/route';
 import { INVESTORS_PATH } from '@/domain/investors/route';
+import { BRIEFING_PATH } from '@/domain/briefing/route';
 import { MACRO_PATH } from '@/domain/macro/route';
 import { NEWS_PATH } from '@/domain/news/route';
 import { TOOLS_PATH } from '@/domain/tools/route';
@@ -18,7 +19,14 @@ import { FIRST_LESSON, lessonPath } from './lessons';
 
 export type OrbitDirection = 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw';
 
-export type OrbitIconKey = 'sprout' | 'calendar' | 'news' | 'people' | 'globe' | 'calculator';
+export type OrbitIconKey =
+  | 'sprout'
+  | 'calendar'
+  | 'news'
+  | 'people'
+  | 'globe'
+  | 'calculator'
+  | 'sunrise';
 
 export interface OrbitEntry {
   id: string;
@@ -70,8 +78,8 @@ export function floatDelayMs(direction: OrbitDirection): number {
 }
 
 /**
- * 채워진 여섯 칸. 대각선 네 칸에 걸어 좌우 대칭을 만들고, 남북을 세로축으로 세웠다.
- * 비는 두 칸(동·서)은 좌우 한 쌍이라 비어 있어도 균형이 깨지지 않는다.
+ * 채워진 일곱 칸. 대각선 네 칸에 걸어 좌우 대칭을 만들고, 남북을 세로축으로 세웠다.
+ * 서쪽 한 칸만 비어 있다.
  */
 export const ORBIT_ENTRIES: readonly OrbitEntry[] = [
   {
@@ -88,6 +96,7 @@ export const ORBIT_ENTRIES: readonly OrbitEntry[] = [
   { id: 'investors', direction: 'sw', label: '투자자들 현황', icon: 'people', href: INVESTORS_PATH },
   { id: 'macro', direction: 'nw', label: '거시 지표', icon: 'globe', href: MACRO_PATH },
   { id: 'tools', direction: 's', label: '투자 도구', icon: 'calculator', href: TOOLS_PATH },
+  { id: 'briefing', direction: 'e', label: '장전 브리핑', icon: 'sunrise', href: BRIEFING_PATH },
 ];
 
-export const ORBIT_EMPTY_DIRECTIONS: readonly OrbitDirection[] = ['e', 'w'];
+export const ORBIT_EMPTY_DIRECTIONS: readonly OrbitDirection[] = ['w'];

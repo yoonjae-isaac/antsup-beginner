@@ -1,4 +1,4 @@
-type PreviewIconKey = 'market' | 'schedule' | 'macro' | 'quote';
+type PreviewIconKey = 'market' | 'schedule' | 'macro' | 'briefing' | 'quote';
 
 interface PreviewIconProps {
   name: PreviewIconKey;
@@ -43,6 +43,16 @@ export default function PreviewIcon({ name }: PreviewIconProps) {
           <circle cx="12" cy="12" r="8.5" />
           <path d="M3.5 12h17" />
           <ellipse cx="12" cy="12" rx="4" ry="8.5" />
+        </>
+      )}
+
+      {name === 'briefing' && (
+        <>
+          <path d="M3.5 19h17" />
+          <path d="M6.5 15.5a5.5 5.5 0 0 1 11 0" />
+          <path d="M12 3v3" />
+          <path d="M5.2 6.2 7 8" />
+          <path d="M18.8 6.2 17 8" />
         </>
       )}
 

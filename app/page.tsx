@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { homeMetadata } from '@/config/site';
+import { loadBriefing } from '@/domain/briefing/briefing';
 import { loadMacroHeadlines } from '@/domain/macro/macro';
 import { loadMarketSnapshot } from '@/domain/preview/market';
 import { loadTodaySchedule } from '@/domain/preview/schedule';
@@ -23,11 +24,12 @@ export const revalidate = 60;
 
 // route 파일은 얇게 — 화면 구성은 src/views 가 갖는다.
 export default async function Page() {
-  const [market, schedule, macro] = await Promise.all([
+  const [market, briefing, schedule, macro] = await Promise.all([
     loadMarketSnapshot(),
+    loadBriefing(),
     loadTodaySchedule(),
     loadMacroHeadlines(),
   ]);
 
-  return <HomePage macro={macro} market={market} schedule={schedule} />;
+  return <HomePage briefing={briefing} macro={macro} market={market} schedule={schedule} />;
 }

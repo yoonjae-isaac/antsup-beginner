@@ -65,6 +65,17 @@ export default function OrbitIcon({ name }: OrbitIconProps) {
         </>
       )}
 
+      {/* 지평선 위로 해가 올라오는 모양 — 장이 열리기 전을 가리킨다. */}
+      {name === 'sunrise' && (
+        <>
+          <path d="M3.5 19h17" />
+          <path d="M6.5 15.5a5.5 5.5 0 0 1 11 0" />
+          <path d="M12 3v3" />
+          <path d="M5.2 6.2 7 8" />
+          <path d="M18.8 6.2 17 8" />
+        </>
+      )}
+
       {/*
         자판 여섯 개는 길이 0 인 선이다. strokeLinecap='round' 가 그걸 동그란 점으로
         그려 준다 — <circle> 로 찍으면 fill='none' 때문에 속이 빈 동그라미가 된다.
