@@ -5,6 +5,7 @@ import { CALENDAR_PATH } from '@/domain/calendar/route';
 import { INVESTORS_PATH } from '@/domain/investors/route';
 import { MACRO_PATH } from '@/domain/macro/route';
 import { BRIEFING_ARCHIVE_PATH, BRIEFING_PATH } from '@/domain/briefing/route';
+import { PRIVACY_PATH, TERMS_PATH } from '@/domain/legal/route';
 import { NEWS_PATH } from '@/domain/news/route';
 import { TOOLS_PATH } from '@/domain/tools/route';
 
@@ -71,6 +72,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
+    })),
+    // 정책 문서. 검색 유입은 없지만 심사에서 공개 여부를 확인하므로 색인에 남긴다.
+    ...[PRIVACY_PATH, TERMS_PATH].map((path) => ({
+      url: new URL(path, SITE_URL).toString(),
+      lastModified,
+      changeFrequency: 'yearly' as const,
+      priority: 0.3,
     })),
   ];
 }

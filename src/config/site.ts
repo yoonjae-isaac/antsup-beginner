@@ -5,7 +5,7 @@
 
 /**
  * 서비스 명칭. 프로젝트(레포) 이름인 antsup-beginner 와 구분한다.
- * 도메인(step.ants-up.com)과 어긋나지 않게 step-ants 로 통일했다 — og:site_name 에 그대로 나간다.
+ * 도메인은 ants-up.com 이고 이름은 step-ants 로 통일했다 — og:site_name 에 그대로 나간다.
  */
 export const SERVICE_NAME = 'step-ants';
 
@@ -18,13 +18,14 @@ export const SERVICE_NAME = 'step-ants';
  * `new URL('')` 에서 빌드가 터진다. 값이 비면 기본값으로 떨어지게 둔다.
  */
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://step.ants-up.com';
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://ants-up.com';
 
 import type { Metadata } from 'next';
 import { lessonPath, type Lesson } from '@/domain/jumi/lessons';
 import { BRIEFING_ARCHIVE_PATH, BRIEFING_PATH } from '@/domain/briefing/route';
 import { CALENDAR_PATH } from '@/domain/calendar/route';
 import { INVESTORS_PATH } from '@/domain/investors/route';
+import { PRIVACY_PATH, TERMS_PATH } from '@/domain/legal/route';
 import { MACRO_PATH } from '@/domain/macro/route';
 import { NEWS_PATH } from '@/domain/news/route';
 import { TOOLS_PATH } from '@/domain/tools/route';
@@ -53,6 +54,25 @@ export function homeMetadata(): Metadata {
   };
 }
 
+/**
+ * og:image — `app/opengraph-image.tsx` 가 만드는 그 이미지.
+ *
+ * 파일 컨벤션만 두면 **루트 세그먼트(홈)에만** 붙는다. 하위 route 가 `openGraph` 를
+ * 통째로 지정하는 순간 부모의 og 블록이 이미지째 대체되기 때문이다.
+ * 그래서 홈 말고 모든 페이지가 직접 이 값을 끼워 넣어야 한다 —
+ * 실제로 2026-10-02 이전까지 홈을 제외한 전 페이지에 og:image 가 없었다.
+ *
+ * 경로에 해시 쿼리를 붙이지 않는다. 손으로 적은 해시는 이미지를 고쳐도 같이 바뀌지 않아
+ * 오히려 낡은 캐시를 가리킨다. 크기·alt 를 함께 적는 이유는 카카오·슬랙 같은 스크래퍼가
+ * 이미지를 내려받기 전에 레이아웃을 잡기 때문이다.
+ */
+const OG_IMAGE = {
+  url: '/opengraph-image',
+  width: 1200,
+  height: 630,
+  alt: SEO.title,
+} as const;
+
 /** 허브에서 갈라져 나온 화면들의 메타데이터. 형태가 같아 한 곳에서 찍어 낸다. */
 function hubPageMetadata(path: string, title: string, description: string): Metadata {
   return {
@@ -66,6 +86,7 @@ function hubPageMetadata(path: string, title: string, description: string): Meta
       siteName: SERVICE_NAME,
       title,
       description,
+      images: [OG_IMAGE],
     },
   };
 }
@@ -127,6 +148,28 @@ export function toolsMetadata(): Metadata {
 }
 
 /**
+ * 정책 문서 메타데이터.
+ *
+ * 검색 유입을 노리는 문서가 아니라 설명을 짧게 둔다. 색인은 막지 않는데,
+ * AdSense·GA 심사에서 이 페이지들이 실제로 공개돼 있는지를 본다.
+ */
+export function privacyMetadata(): Metadata {
+  return hubPageMetadata(
+    PRIVACY_PATH,
+    '개인정보처리방침 · step-ants',
+    'AntsUp 이 어떤 정보를 수집하고 어떻게 쓰는지, 쿠키와 광고에 대한 선택권을 어떻게 드리는지 정리했습니다.',
+  );
+}
+
+export function termsMetadata(): Metadata {
+  return hubPageMetadata(
+    TERMS_PATH,
+    '이용약관 · step-ants',
+    'AntsUp 서비스의 성격과 면책, 지식재산권, 금지 행위에 관한 약관입니다.',
+  );
+}
+
+/**
  * 레슨 한 건의 페이지 메타데이터.
  *
  * openGraph 는 레이아웃과 병합되지 않고 통째로 덮어써지므로,
@@ -146,6 +189,7 @@ export function lessonMetadata(lesson: Lesson): Metadata {
       siteName: SERVICE_NAME,
       title: lesson.seoTitle,
       description: lesson.seoDescription,
+      images: [OG_IMAGE],
     },
   };
 }

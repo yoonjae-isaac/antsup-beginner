@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import {
   FOOTER_ABOUT,
   FOOTER_ABOUT_HEADING,
@@ -6,6 +7,7 @@ import {
   FOOTER_SOURCE,
   FOOTER_SOURCE_HEADING,
 } from '@/domain/jumi/landingCopy';
+import { PRIVACY_PATH, TERMS_PATH } from '@/domain/legal/route';
 
 interface SiteFooterProps {
   /**
@@ -45,8 +47,22 @@ export default function SiteFooter({ width }: SiteFooterProps) {
 
       <p className="mt-8 max-w-2xl text-[11px] leading-relaxed">{FOOTER_DISCLAIMER}</p>
 
+      {/*
+        정책 문서 링크. 눈에 띄게 둘 필요는 없지만 모든 페이지에서 닿아야 한다 —
+        AdSense·GA 정책이 요구하고, 동의 배너의 '개인정보처리방침' 링크도 같은 곳을 가리킨다.
+      */}
+      <nav className="mt-6 flex items-center gap-3 text-[11px]">
+        <Link href={PRIVACY_PATH} className="transition-colors hover:text-cb-foreground">
+          개인정보처리방침
+        </Link>
+        <span aria-hidden="true">·</span>
+        <Link href={TERMS_PATH} className="transition-colors hover:text-cb-foreground">
+          이용약관
+        </Link>
+      </nav>
+
       {/* 연도는 일부러 뺐다 — 정적 생성이라 빌드 시점 연도가 그대로 굳어 해가 바뀌면 틀린 말이 된다. */}
-      <p className="mt-6 text-[11px]">© {FOOTER_NOTE}</p>
+      <p className="mt-3 text-[11px]">© {FOOTER_NOTE}</p>
     </footer>
   );
 }
