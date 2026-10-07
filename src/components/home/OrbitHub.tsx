@@ -35,7 +35,10 @@ function slotStyle(direction: OrbitDirection, delayMs?: number): CSSProperties {
 
 /**
  * 주미를 가운데 두고 여덟 방향으로 입구가 떠 있는 홈 허브.
- * 이동 연결은 아직 없다 — 자리와 형태만 잡아 둔 상태다.
+ *
+ * 여덟 칸이 전부 찼고 전부 연결돼 있다(ORBIT_ENTRIES). 아래의 점선 자리와
+ * disabled 버튼 분기는 칸이 다시 비거나 갈 곳 없는 입구가 생길 때를 위해 남겨 둔 것이고,
+ * 지금은 그려지지 않는다.
  */
 export default function OrbitHub() {
   return (
