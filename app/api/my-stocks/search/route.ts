@@ -4,7 +4,7 @@ import { searchSymbols } from '@/domain/stocks/catalog';
 /**
  * 종목 검색 — 브라우저가 자동완성을 그리려고 부른다.
  *
- * 카탈로그(symbolNames + symbolMarkets, 합쳐 800KB)를 번들에 싣지 않으려고 둔 길이다.
+ * 카탈로그(symbols.json, 1MB)를 번들에 싣지 않으려고 둔 길이다.
  * 백엔드에는 가지 않는다 — 검색은 우리 파일만 보면 되는 일이라 바깥으로 나갈 이유가 없다.
  *
  * 저장소를 읽지 않고 입력에만 의존하므로 같은 q 는 늘 같은 답이다. 그래서 CDN 에도

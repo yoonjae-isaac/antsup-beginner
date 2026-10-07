@@ -6,7 +6,7 @@ import {
 } from '@/config/backendRoutes';
 import { investorNameByCik, investorNameByPerson } from '@/domain/investors/names';
 import { loadLogos } from '@/domain/stocks/logos';
-import { koreanSymbolName } from '@/domain/stocks/symbolNames';
+import { koreanSymbolName } from '@/domain/stocks/catalog';
 
 
 export type StockView = 'held' | 'bought' | 'sold';

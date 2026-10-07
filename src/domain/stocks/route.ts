@@ -4,7 +4,7 @@
  */
 export const MY_STOCKS_PATH = '/my-stocks';
 
-/** 종목 검색. symbolMarkets·symbolNames 가 서버에만 있어 브라우저는 이 길로만 찾는다. */
+/** 종목 검색. 카탈로그(symbols.json)가 서버에만 있어 브라우저는 이 길로만 찾는다. */
 export const MY_STOCKS_SEARCH_API = '/api/my-stocks/search';
 
 /** 담아 둔 종목 묶음 시세. 백엔드 주소와 내부 키를 서버에 가둬 두기 위한 프록시다. */

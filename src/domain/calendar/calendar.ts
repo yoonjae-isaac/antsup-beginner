@@ -1,7 +1,7 @@
 import { backendGet } from '@/config/backend';
 import { BACKEND_ROUTES, type CalendarWeekResponse, type NewsMarket } from '@/config/backendRoutes';
 import { loadLogos } from '@/domain/stocks/logos';
-import { koreanSymbolName } from '@/domain/stocks/symbolNames';
+import { koreanSymbolName } from '@/domain/stocks/catalog';
 
 
 export type CalendarKind = 'earning' | 'economic' | 'ipo';
