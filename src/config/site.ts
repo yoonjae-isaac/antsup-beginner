@@ -28,6 +28,7 @@ import { INVESTORS_PATH } from '@/domain/investors/route';
 import { PRIVACY_PATH, TERMS_PATH } from '@/domain/legal/route';
 import { MACRO_PATH } from '@/domain/macro/route';
 import { NEWS_PATH } from '@/domain/news/route';
+import { MY_STOCKS_PATH } from '@/domain/stocks/route';
 import { TOOLS_PATH } from '@/domain/tools/route';
 
 /** 홈(서비스 허브)의 SEO 문구. 레슨별 문구는 lessons.ts 가 소유한다. */
@@ -136,6 +137,20 @@ export function briefingArchiveMetadata(): Metadata {
     BRIEFING_ARCHIVE_PATH,
     '지난 브리핑 · step-ants',
     '날마다 장 시작 전에 올라온 브리핑을 모았어요. 그날 시장에 무슨 이야기가 많았는지 한 줄씩 돌아볼 수 있습니다.',
+  );
+}
+
+/**
+ * 내 주식.
+ *
+ * 설명에 '담아 둔다'를 쓰고 '보유·포트폴리오'는 쓰지 않는다 — 수량도 평단도 받지 않는
+ * 화면이라, 검색 결과에서 그렇게 읽히면 들어와서 찾는 걸 못 찾는다.
+ */
+export function myStocksMetadata(): Metadata {
+  return hubPageMetadata(
+    MY_STOCKS_PATH,
+    '내 주식 · step-ants',
+    '관심 가는 종목을 담아 두고 오늘 가격과 등락률을 한눈에 보세요. 목록은 이 브라우저에만 저장되고 로그인이 필요 없어요.',
   );
 }
 

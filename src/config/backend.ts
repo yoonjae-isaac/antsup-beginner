@@ -31,6 +31,15 @@ export interface BackendEndpoint<TResponse, TParams = void> {
   readonly path: string;
   /** ISR 창(초). 엔드포인트마다 신선도가 다르므로 목록이 들고 있는다. */
   readonly revalidate: number;
+  /**
+   * Next 의 Data Cache 를 아예 쓰지 않는다 — 요청할 때마다 백엔드로 간다.
+   *
+   * 이 층은 만료된 값을 일단 내주고 뒤에서 다시 받아 오는데(stale-while-revalidate),
+   * 뒤의 재요청이 실패하면 낡은 값을 **계속** 내준다. 뉴스 제목이야 좀 낡아도 그만이지만
+   * 시세는 '지금 얼마'라고 적어 두고 어제 값을 보여 주는 꼴이 된다.
+   * 그래서 가격처럼 낡으면 거짓말이 되는 값만 이걸 켠다. 대신 캐시는 백엔드 Redis 가 맡는다.
+   */
+  readonly noStore?: true;
   /** 쿼리스트링이 필요한 엔드포인트만 둔다. */
   readonly query?: (params: TParams) => Record<string, string>;
   /** 타입 표식 전용. 값이 들어가는 일은 없다. */
@@ -79,7 +88,9 @@ export async function backendGet<TResponse, TParams>(
   try {
     const response = await fetch(url, {
       headers,
-      next: { revalidate: endpoint.revalidate },
+      ...(endpoint.noStore
+        ? { cache: 'no-store' as const }
+        : { next: { revalidate: endpoint.revalidate } }),
     });
     if (!response.ok) return null;
 

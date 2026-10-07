@@ -77,6 +77,14 @@ export default function OrbitIcon({ name }: OrbitIconProps) {
       )}
 
       {/*
+        책갈피 — '담아 뒀다'는 뜻이다. 지갑·동전을 쓰면 돈을 넣었다는 말이 되는데,
+        이 화면은 수량도 평단도 받지 않는다. PreviewIcon 의 bookmark 와 같은 그림이어야 한다.
+      */}
+      {name === 'bookmark' && (
+        <path d="M6.5 4h11a1 1 0 0 1 1 1v15.2l-6.5-4.7-6.5 4.7V5a1 1 0 0 1 1-1z" />
+      )}
+
+      {/*
         자판 여섯 개는 길이 0 인 선이다. strokeLinecap='round' 가 그걸 동그란 점으로
         그려 준다 — <circle> 로 찍으면 fill='none' 때문에 속이 빈 동그라미가 된다.
       */}

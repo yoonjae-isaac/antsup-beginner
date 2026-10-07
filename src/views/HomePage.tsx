@@ -2,6 +2,7 @@ import ContentPreview from '@/components/home/ContentPreview';
 import OrbitHub from '@/components/home/OrbitHub';
 import SiteFooter from '@/components/layout/SiteFooter';
 import type { Briefing } from '@/domain/briefing/types';
+import { ORBIT_EMPTY_DIRECTIONS } from '@/domain/jumi/homeOrbit';
 import { HOME_EYEBROW, HOME_HEADING, ORBIT_EMPTY_HINT } from '@/domain/jumi/landingCopy';
 import type { MacroIndicator } from '@/domain/macro/macro';
 import type { MarketSnapshot } from '@/domain/preview/market';
@@ -69,10 +70,13 @@ export default function HomePage({ market, briefing, schedule, macro }: HomePage
           <OrbitHub />
         </div>
 
-        <div className="flex items-center gap-2.5 lg:hidden">
-          <span className="size-[11px] shrink-0 rounded-full border border-dashed border-cb-border-strong" />
-          <span className="text-xs leading-relaxed text-cb-muted">{ORBIT_EMPTY_HINT}</span>
-        </div>
+        {/* 빈 칸이 하나도 없으면 이 줄도 없다 — 여덟 칸이 다 찬 날부터 거짓말이 된다. */}
+        {ORBIT_EMPTY_DIRECTIONS.length > 0 && (
+          <div className="flex items-center gap-2.5 lg:hidden">
+            <span className="size-[11px] shrink-0 rounded-full border border-dashed border-cb-border-strong" />
+            <span className="text-xs leading-relaxed text-cb-muted">{ORBIT_EMPTY_HINT}</span>
+          </div>
+        )}
       </main>
 
       <SiteFooter width="hub" />

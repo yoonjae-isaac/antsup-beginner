@@ -1,4 +1,4 @@
-type PreviewIconKey = 'market' | 'schedule' | 'macro' | 'briefing' | 'quote';
+type PreviewIconKey = 'market' | 'schedule' | 'macro' | 'briefing' | 'quote' | 'bookmark';
 
 interface PreviewIconProps {
   name: PreviewIconKey;
@@ -27,6 +27,12 @@ export default function PreviewIcon({ name }: PreviewIconProps) {
           <path d="M15.5 6.5h5v5" />
         </>
       )}
+
+      {/*
+        책갈피 — '담아 뒀다'는 뜻이다. 지갑이나 동전을 쓰지 않는 이유는 돈을 넣었다는
+        말이 되기 때문이다. 우리는 수량도 평단도 받지 않는다.
+      */}
+      {name === 'bookmark' && <path d="M6.5 4h11a1 1 0 0 1 1 1v15.2l-6.5-4.7-6.5 4.7V5a1 1 0 0 1 1-1z" />}
 
       {/* 오비트의 같은 입구와 같은 그림이어야 한다 — 카드와 버튼이 같은 곳을 가리킨다. */}
       {name === 'schedule' && (

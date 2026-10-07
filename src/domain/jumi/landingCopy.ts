@@ -27,6 +27,52 @@ export const ORBIT_NAV_LABEL = '서비스 바로가기';
 export const ORBIT_EMPTY_HINT = '빈 자리 한 곳은 아직 준비 중이에요';
 
 /**
+ * 내 주식 — 담아 두고 오늘 가격만 보는 자리.
+ *
+ * 말투에 조심할 곳이 둘이다. '보유'·'포트폴리오'라고 하면 수량·평단을 받는 화면처럼
+ * 읽히는데 우리는 그걸 안 받는다. 그래서 '담아 둔다'로 쓴다. 또 가격을 보여 준다고
+ * 사고팔라는 뜻이 되지 않게, 화면 아래 고지를 반드시 같이 둔다.
+ */
+export const MY_STOCKS_TITLE = '내 주식';
+export const MY_STOCKS_LEAD =
+  '담아 둔 종목의 오늘 가격이에요. 이 목록은 이 브라우저에만 저장돼요 — 로그인이 없으니 다른 기기에서는 보이지 않고, 저희 서버로도 올라가지 않아요.';
+export const MY_STOCKS_ADD_LABEL = '종목 추가';
+export const MY_STOCKS_SEARCH_PLACEHOLDER = '종목명이나 코드로 찾아보세요 (예: 삼성전자, 005930, NVDA)';
+export const MY_STOCKS_SEARCH_EMPTY = '찾는 종목이 없어요. 코드나 한글 이름으로 쳐 보세요.';
+export const MY_STOCKS_ALREADY = '이미 담음';
+export const MY_STOCKS_ADD_ONE = '+ 담기';
+export const MY_STOCKS_FULL = (max: number) => `최대 ${max}종목까지 담을 수 있어요`;
+export const MY_STOCKS_COUNT = (count: number) => `담아 둔 종목 ${count}`;
+export const MY_STOCKS_REMOVE = (name: string) => `${name} 빼기`;
+export const MY_STOCKS_NO_PRICE = '가격을 못 가져왔어요 · 잠시 뒤 다시 보여드릴게요';
+export const MY_STOCKS_LOADING = '가격을 받아오는 중이에요';
+export const MY_STOCKS_EMPTY_TITLE = '아직 담아 둔 종목이 없어요';
+export const MY_STOCKS_EMPTY_BODY =
+  '관심 가는 종목을 넣어 두면 오늘 얼마인지 여기서 바로 보여드릴게요. 사고파는 것과는 상관없어요 — 그냥 눈에 담아 두는 자리예요.';
+export const MY_STOCKS_EMPTY_CTA = '종목 담으러 가기';
+export const MY_STOCKS_MORE = (total: number) => `${total}종목 전체 보기 →`;
+/**
+ * 종목을 펼치면 나오는 관련 뉴스.
+ *
+ * '호재·악재' 같은 말은 쓰지 않는다. 기사를 모아 보여 줄 뿐 그게 오를 신호인지
+ * 내릴 신호인지는 우리가 말할 수 있는 것이 아니고, 말하는 순간 투자 조언이 된다.
+ */
+export const MY_STOCKS_NEWS_TITLE = (name: string) => `${name} 관련 뉴스`;
+export const MY_STOCKS_NEWS_LOADING = '기사를 찾아보는 중이에요';
+/**
+ * '기사가 없다'고 단정하지 않는다. 빈 응답은 정말 기사가 없을 때도 오고 백엔드나
+ * 출처가 막혔을 때도 오는데, 화면은 그 둘을 가릴 수 없다. 못 가린 걸 가린 척하지 않는다.
+ */
+export const MY_STOCKS_NEWS_EMPTY = '지금은 보여드릴 기사가 없어요. 잠시 뒤 다시 열어 보세요.';
+export const MY_STOCKS_NEWS_NOTE = '최근 기사 10건이에요. 좋고 나쁨은 가리지 않고 모아 둔 거예요.';
+export const MY_STOCKS_NEWS_OPEN = (name: string) => `${name} 관련 뉴스 펼치기`;
+export const MY_STOCKS_NEWS_CLOSE = (name: string) => `${name} 관련 뉴스 접기`;
+
+/** 가격을 보여 주는 화면마다 같이 둔다. 푸터의 면책과 같은 말을 이 자리에서 한 번 더 한다. */
+export const MY_STOCKS_DISCLAIMER =
+  '가격은 참고용이에요. 실제 체결가와 다를 수 있고, 저희는 매수·매도를 권유하지 않아요.';
+
+/**
  * 홈 좌측 컨텐츠 프리뷰 — 환율·시장 카드와 오늘의 명언 카드.
  * 숫자는 cash-bite-backend 에서 오고, 여기 있는 건 라벨뿐이다.
  */

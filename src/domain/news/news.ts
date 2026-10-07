@@ -89,7 +89,8 @@ function toDigests(
   };
 }
 
-function toArticles(rows: readonly NewsArticleResponse[], now: Date): NewsArticle[] {
+/** 종목 관련 뉴스 라우트 핸들러도 같은 모양으로 내보내야 해서 공개한다. */
+export function toArticles(rows: readonly NewsArticleResponse[], now: Date): NewsArticle[] {
   return rows.map((row) => ({
     id: row.id,
     title: row.title,

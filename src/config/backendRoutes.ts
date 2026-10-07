@@ -47,6 +47,30 @@ export interface IndexQuoteResponse {
  */
 export const MARKET_REVALIDATE_SECONDS = 60;
 
+/**
+ * `/market/quotes` 한 건 — 지수와 같은 모양에 장 상태만 더했다.
+ * 도메인 쪽 StockQuote 와 같은 필드를 쓴다. 여기 둔 건 '백엔드가 주는 모양' 이라는 뜻이고,
+ * 화면이 쓰는 타입은 domain/stocks/types.ts 가 갖는다.
+ */
+export interface StockQuoteResponse {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  currency: string;
+  marketState: 'REGULAR' | 'CLOSED' | 'PRE' | 'PREPRE' | 'POST' | 'POSTPOST';
+}
+
+/**
+ * 종목 시세 갱신 주기(초).
+ *
+ * 브라우저 캐시(QUOTE_TTL_MS)·백엔드 Redis TTL 과 같은 1분이다. Next 의 Data Cache 는
+ * 이 엔드포인트만 꺼 두므로(noStore) 실제로 값을 들고 있는 층은 그 둘뿐이고,
+ * 이 값은 프록시 응답의 Cache-Control 을 정하는 데 쓴다.
+ */
+export const QUOTE_REVALIDATE_SECONDS = 60;
+
 /** 뉴스 시장 구분. 백엔드 쿼리 값 그대로다. */
 export type NewsMarket = 'KR' | 'US';
 
@@ -84,6 +108,15 @@ export interface NewsDigestResponse {
  * app/news/page.tsx 의 `export const revalidate` 와 같은 값을 유지할 것.
  */
 export const NEWS_REVALIDATE_SECONDS = 300;
+
+/**
+ * 종목 관련 뉴스 갱신 주기(초).
+ *
+ * 피드(5분)보다 짧은 1분이다. 백엔드가 이걸 DB 에 쌓지 않고 부를 때마다 외부 API 로
+ * 나가면서 Redis 에 1분만 들고 있어서, 그 위에 더 긴 창을 씌우면 백엔드가 이미 새로
+ * 받아 온 기사를 Next 가 가리게 된다.
+ */
+export const TICKER_NEWS_REVALIDATE_SECONDS = 60;
 
 /** `/macro/overview` 한 건. entry 는 카탈로그 정의, latest 는 최신 관측이다. */
 export interface MacroOverviewResponse {
@@ -226,10 +259,36 @@ export const BACKEND_ROUTES = {
     revalidate: MARKET_REVALIDATE_SECONDS,
   }),
 
+  /**
+   * 담아 둔 종목 묶음 시세 — '내 주식'이 쓴다.
+   *
+   * 한 번에 최대 20종목(백엔드 MAX_QUOTE_SYMBOLS). 허용 목록 밖이거나 시세를 못 받은
+   * 종목은 응답에서 빠지므로, 부르는 쪽이 보낸 심볼과 짝지어 빈자리를 그려야 한다.
+   */
+  marketQuotes: defineEndpoint<StockQuoteResponse[], { symbols: readonly string[] }>({
+    path: '/market/quotes',
+    revalidate: QUOTE_REVALIDATE_SECONDS,
+    // 가격은 낡으면 거짓말이 된다 — Next 층을 건너뛰고 브라우저(1분)와 백엔드 Redis(1분)만 둔다.
+    noStore: true,
+    query: ({ symbols }) => ({ symbols: symbols.join(',') }),
+  }),
+
   newsArticles: defineEndpoint<NewsArticleResponse[], { market: NewsMarket; limit: number }>({
     path: '/news',
     revalidate: NEWS_REVALIDATE_SECONDS,
     query: ({ market, limit }) => ({ market, limit: String(limit) }),
+  }),
+
+  /**
+   * 종목 관련 뉴스 (온디맨드, 최신 10). DB 에 쌓이지 않고 백엔드가 그때 외부 API 를 부른다.
+   *
+   * query 가 시장마다 다른 값이다 — KR 은 네이버 검색어라 **회사명**, US 는 Finnhub
+   * company-news 라 **티커**다. 코드로 KR 을 찾으면 엉뚱한 기사가 섞인다.
+   */
+  newsTicker: defineEndpoint<NewsArticleResponse[], { market: NewsMarket; query: string }>({
+    path: '/news/ticker',
+    revalidate: TICKER_NEWS_REVALIDATE_SECONDS,
+    query: ({ market, query }) => ({ market, query }),
   }),
 
   newsDigests: defineEndpoint<NewsDigestResponse[], { market: NewsMarket; limit: number }>({

@@ -7,6 +7,7 @@ import { MACRO_PATH } from '@/domain/macro/route';
 import { BRIEFING_ARCHIVE_PATH, BRIEFING_PATH } from '@/domain/briefing/route';
 import { PRIVACY_PATH, TERMS_PATH } from '@/domain/legal/route';
 import { NEWS_PATH } from '@/domain/news/route';
+import { MY_STOCKS_PATH } from '@/domain/stocks/route';
 import { TOOLS_PATH } from '@/domain/tools/route';
 
 // /sitemap.xml — 국내 전용 단일 로케일이라 hreflang alternates 없이 ko 단일 URL 이다.
@@ -66,6 +67,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: 'monthly',
       priority: 0.85,
+    },
+    // 내 주식도 정적이다 — 목록은 브라우저에 있어 색인에 잡히는 건 설명뿐이다.
+    {
+      url: new URL(MY_STOCKS_PATH, SITE_URL).toString(),
+      lastModified,
+      changeFrequency: 'monthly',
+      priority: 0.7,
     },
     ...LESSONS.map((lesson) => ({
       url: new URL(lessonPath(lesson.slug), SITE_URL).toString(),

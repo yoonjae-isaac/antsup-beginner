@@ -12,6 +12,7 @@ import {
 import BriefingCard from '@/components/home/BriefingCard';
 import MacroCard from '@/components/home/MacroCard';
 import MarketCard from '@/components/home/MarketCard';
+import MyStocksCard from '@/components/home/MyStocksCard';
 import QuoteCard from '@/components/home/QuoteCard';
 import ScheduleCard from '@/components/home/ScheduleCard';
 import type { Briefing } from '@/domain/briefing/types';
@@ -20,6 +21,7 @@ import {
   PREVIEW_BRIEFING_TITLE,
   PREVIEW_MACRO_TITLE,
   PREVIEW_MANUAL_HINT,
+  MY_STOCKS_TITLE,
   PREVIEW_MARKET_TITLE,
   PREVIEW_NAV_LABEL,
   PREVIEW_NEXT_LABEL,
@@ -28,6 +30,7 @@ import {
   PREVIEW_SCHEDULE_TITLE,
 } from '@/domain/jumi/landingCopy';
 import type { MacroIndicator } from '@/domain/macro/macro';
+import { useMyStocks } from '@/domain/stocks/myStocks';
 import type { MarketSnapshot } from '@/domain/preview/market';
 import type { TodaySchedule } from '@/domain/preview/schedule';
 import type { InvestorQuote } from '@/domain/preview/quotes';
@@ -101,8 +104,15 @@ export default function ContentPreview({
   quoteIndex,
   quoteTotal,
 }: ContentPreviewProps) {
+  // 담아 둔 종목은 브라우저에만 있다. 서버 렌더에서는 빈 배열이고 마운트 직후 채워진다.
+  const mine = useMyStocks();
+
   const cards: { id: string; label: string; body: ReactNode }[] = [
-    // 장전 브리핑이 맨 앞이다 — 아침에 들어온 사람에게 오늘을 가장 먼저 말해 준다.
+    // 내 주식이 맨 앞이다 — 직접 담은 종목보다 먼저 볼 게 없다. 담은 게 없으면 카드째 빠진다.
+    ...(mine.length > 0
+      ? [{ id: 'mystocks', label: MY_STOCKS_TITLE, body: <MyStocksCard /> }]
+      : []),
+    // 그다음이 장전 브리핑이다 — 아침에 들어온 사람에게 오늘을 가장 먼저 말해 준다.
     ...(briefing
       ? [
           {
@@ -134,10 +144,17 @@ export default function ContentPreview({
     },
   ];
 
-  const [front, setFront] = useState(0);
+  const [picked, setFront] = useState(0);
   // 한 번이라도 직접 넘기면 자동 전환을 멈춘다. 읽는 중에 카드가 바뀌면,
   // 넘긴 사람 입장에서는 눌러 봐야 소용없는 화면이 된다.
   const [manual, setManual] = useState(false);
+
+  /*
+    카드 수는 도중에 줄어들 수 있다 — 다른 탭에서 담아 둔 종목을 전부 빼면 '내 주식'
+    카드가 통째로 사라진다. 그때 고른 번호를 그대로 두면 덱 뒤쪽 빈자리를 가리키게 되어
+    아무 카드도 안 보인다. 상태를 고치지 않고 읽을 때만 범위로 접는다.
+  */
+  const front = Math.min(picked, Math.max(cards.length - 1, 0));
 
   // front 를 의존성에 둔 게 의도다 — 직접 고른 순간에도 타이머가 처음부터 다시 돈다.
   useEffect(() => {

@@ -14,6 +14,7 @@ import { INVESTORS_PATH } from '@/domain/investors/route';
 import { BRIEFING_PATH } from '@/domain/briefing/route';
 import { MACRO_PATH } from '@/domain/macro/route';
 import { NEWS_PATH } from '@/domain/news/route';
+import { MY_STOCKS_PATH } from '@/domain/stocks/route';
 import { TOOLS_PATH } from '@/domain/tools/route';
 import { FIRST_LESSON, lessonPath } from './lessons';
 
@@ -26,7 +27,8 @@ export type OrbitIconKey =
   | 'people'
   | 'globe'
   | 'calculator'
-  | 'sunrise';
+  | 'sunrise'
+  | 'bookmark';
 
 export interface OrbitEntry {
   id: string;
@@ -78,8 +80,8 @@ export function floatDelayMs(direction: OrbitDirection): number {
 }
 
 /**
- * 채워진 일곱 칸. 대각선 네 칸에 걸어 좌우 대칭을 만들고, 남북을 세로축으로 세웠다.
- * 서쪽 한 칸만 비어 있다.
+ * 여덟 칸이 전부 찼다. 대각선 네 칸으로 좌우 대칭을 만들고, 남북을 세로축으로 세웠다.
+ * 마지막까지 비어 있던 서쪽은 '내 주식'이 받았다.
  */
 export const ORBIT_ENTRIES: readonly OrbitEntry[] = [
   {
@@ -97,6 +99,7 @@ export const ORBIT_ENTRIES: readonly OrbitEntry[] = [
   { id: 'macro', direction: 'nw', label: '거시 지표', icon: 'globe', href: MACRO_PATH },
   { id: 'tools', direction: 's', label: '투자 도구', icon: 'calculator', href: TOOLS_PATH },
   { id: 'briefing', direction: 'e', label: '장전 브리핑', icon: 'sunrise', href: BRIEFING_PATH },
+  { id: 'mystocks', direction: 'w', label: '내 주식', icon: 'bookmark', href: MY_STOCKS_PATH },
 ];
 
-export const ORBIT_EMPTY_DIRECTIONS: readonly OrbitDirection[] = ['w'];
+export const ORBIT_EMPTY_DIRECTIONS: readonly OrbitDirection[] = [];
