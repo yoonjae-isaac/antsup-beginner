@@ -10,7 +10,15 @@
 export const SERVICE_NAME = 'step-ants';
 
 /**
- * 배포 도메인. 환경변수로 덮어쓸 수 있게 둔 이유는 Vercel 프리뷰 배포 때문이다.
+ * 배포 도메인. canonical·og:url·robots·sitemap 이 전부 이 값에서 나온다.
+ *
+ * **www 를 붙이는 게 맞다.** apex 도메인(ants-up.com)은 DNS 스펙상 CNAME 을 못 써서
+ * A 레코드로 IP 를 박아야 하는데, www 는 CNAME 이라 Vercel 이 트래픽을 옮길 수 있다.
+ * 그래서 Vercel 도 www 를 primary 로 두라고 권하고, 실제 배포도 그렇게 돼 있다
+ * (ants-up.com → 308 → www.ants-up.com). 여기만 non-www 였던 탓에 우리가 구글에
+ * 알려 주던 주소가 전부 곧바로 리다이렉트되는 주소였다.
+ *
+ * 환경변수로 덮어쓸 수 있게 둔 이유는 Vercel 프리뷰 배포 때문이다.
  * 프리뷰에서 canonical·og:url 이 프로덕션을 가리키면 색인이 꼬인다.
  *
  * `??` 가 아니라 `||` 인 이유: Vercel 대시보드에서 키만 만들고 값을 비워두면
@@ -18,7 +26,7 @@ export const SERVICE_NAME = 'step-ants';
  * `new URL('')` 에서 빌드가 터진다. 값이 비면 기본값으로 떨어지게 둔다.
  */
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://ants-up.com';
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://www.ants-up.com';
 
 import type { Metadata } from 'next';
 import { lessonPath, type Lesson } from '@/domain/jumi/lessons';
